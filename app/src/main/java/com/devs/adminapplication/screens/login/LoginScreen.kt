@@ -1,6 +1,9 @@
 package com.devs.adminapplication.screens
 
 import android.annotation.SuppressLint
+import android.app.Application
+import android.content.SharedPreferences
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -26,16 +29,24 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.preference.PreferenceManager
 import com.devs.adminapplication.R
+import com.devs.adminapplication.navigation.AdminScreens
+import com.devs.adminapplication.retrofit.Constants
 import com.devs.adminapplication.ui.theme.PrimaryDark
-import com.devs.adminapplication.screens.Login.LoginViewModel
+import com.devs.adminapplication.screens.login.LoginViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel
-) {
+    navController: NavController,
+    viewModel: LoginViewModel,
+
+    ) {
 
     //ui
     var email by remember {
@@ -158,7 +169,14 @@ fun LoginScreen(
 //                        }
 //                    }
                 keyboardController?.hide()
-                viewModel.loginUser(email, password)
+                viewModel.loginUser(email, password){
+                    navController.navigate(AdminScreens.HomeScreen.name){
+                        popUpTo(AdminScreens.LoginScreen.name){
+                            inclusive=true
+                        }
+                    }
+                }
+
             },
             enabled = true,
             colors = ButtonDefaults.buttonColors(
@@ -188,7 +206,6 @@ fun LoginScreen(
                 Toast.makeText(context, viewModel.failReason.value, Toast.LENGTH_SHORT).show()
                 viewModel.resetFailReason()
             }
-
 
         }
     }

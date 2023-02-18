@@ -1,26 +1,33 @@
 package com.devs.adminapplication
 
-import android.app.Application
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-
-import com.devs.adminapplication.screens.LoginScreen
+import androidx.preference.PreferenceManager
+import com.devs.adminapplication.navigation.AdminNavigation
+import com.devs.adminapplication.navigation.AdminScreens
+import com.devs.adminapplication.retrofit.Constants
 import com.devs.adminapplication.ui.theme.AdminApplicationTheme
-import com.devs.adminapplication.screens.Login.LoginViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 
+
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    val viewModel: LoginViewModel by viewModels()
+//    var sharedpreferences = application?.getSharedPreferences(Constants.USER_DATA, Context.MODE_PRIVATE)
+//    val viewModel: LoginViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        var prefs=PreferenceManager.getDefaultSharedPreferences(this)
+        var token:String?=null
         super.onCreate(savedInstanceState)
         setContent {
             AdminApplicationTheme {
@@ -29,14 +36,25 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-//                    val currentUser=SessionManager.getToken(getApplication().applicationContext)
+//                    val currentUser=SessionManager.getToken(application.applicationContext)
 //                    Log.d("LoginFlow", "onCreate: ${currentUser.toString()}")
 //                    if (currentUser!=null)
-//                        AdminNavigation( startDestination =AdminScreens.HomeScreen.name )
+//                        AdminNavigation( startDestination =AdminScreens.HomeScreen.name,sharedpreferences=sharedpreferences )
 //                    else
-//                        AdminNavigation( startDestination =AdminScreens.LoginScreen.name )
+
+                    Log.d("LoginFlow", "onCreate: "+ prefs.getString(Constants.USER_TOKEN,"ndjci"))
+                    token=prefs.getString(Constants.USER_TOKEN,null)
+                    Log.d("LoginFlow", "onCreate: "+ token)
+                    if (token==null)
+                        AdminNavigation(
+                            startDestination =AdminScreens.LoginScreen.name
+                        )
+                    else
+                        AdminNavigation(startDestination = AdminScreens.HomeScreen.name)
+                        
+
                     Log.d("LoginFlow", "Started")
-                    LoginScreen(viewModel)
+//                    LoginScreen(viewModel)
                 }
             }
         }

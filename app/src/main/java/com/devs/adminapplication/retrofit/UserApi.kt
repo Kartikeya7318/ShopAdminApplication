@@ -15,9 +15,4 @@ interface UserApi {
     @POST(Constants.LOGIN_URL)
     suspend fun loginUser(@Body loginRequest: LoginRequest): Response<LoginResponse>
 
-    companion object {
-        fun getApi(): UserApi? {
-            return RetrofitClient.client?.create(UserApi::class.java)
-        }
-    }
 }
