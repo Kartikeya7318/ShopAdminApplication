@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.devs.adminapplication.screens.login.LoginViewModel
 import com.devs.adminapplication.screens.LoginScreen
 import com.devs.adminapplication.screens.home.HomeScreen
+import com.devs.adminapplication.screens.home.HomeViewModel
 
 @Composable
 fun AdminNavigation(startDestination: String) {
@@ -22,7 +23,8 @@ fun AdminNavigation(startDestination: String) {
             LoginScreen(navController=navController,viewModel =loginViewModel)
         }
         composable(AdminScreens.HomeScreen.name){
-            HomeScreen()
+            val homeViewModel= hiltViewModel<HomeViewModel>()
+            HomeScreen(navController=navController,homeViewModel)
         }
     }
 }

@@ -1,8 +1,7 @@
-package com.devs.adminapplication
+package com.devs.adminapplication.utils
 
 import android.content.Context
 import androidx.preference.PreferenceManager
-import com.devs.adminapplication.retrofit.Constants
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton

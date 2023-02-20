@@ -9,6 +9,7 @@ val Teal200 = Color(0xFF03DAC5)
 val PrimaryText= Color(0xDE000000)
 val SecondaryText =Color(0x99000000)
 val PrimaryLight= Color(0xFFB6F0EC)
+
 val PrimaryDark= Color(0xFF85D4D9)
 val ProfitGreen= Color(0xFF006A66)
 val LossRed= Color(0xFFBA1B1B)

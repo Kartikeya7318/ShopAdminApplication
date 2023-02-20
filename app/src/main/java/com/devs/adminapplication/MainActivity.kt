@@ -1,6 +1,5 @@
 package com.devs.adminapplication
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -13,7 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.preference.PreferenceManager
 import com.devs.adminapplication.navigation.AdminNavigation
 import com.devs.adminapplication.navigation.AdminScreens
-import com.devs.adminapplication.retrofit.Constants
+import com.devs.adminapplication.utils.Constants
 import com.devs.adminapplication.ui.theme.AdminApplicationTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -45,13 +44,13 @@ class MainActivity : ComponentActivity() {
                     Log.d("LoginFlow", "onCreate: "+ prefs.getString(Constants.USER_TOKEN,"ndjci"))
                     token=prefs.getString(Constants.USER_TOKEN,null)
                     Log.d("LoginFlow", "onCreate: "+ token)
-                    if (token==null)
+                    if (token!=null)
+                        token=null
+                    Log.d("LoginFlow", "onCreate: "+ token)
                         AdminNavigation(
                             startDestination =AdminScreens.LoginScreen.name
                         )
-                    else
-                        AdminNavigation(startDestination = AdminScreens.HomeScreen.name)
-                        
+
 
                     Log.d("LoginFlow", "Started")
 //                    LoginScreen(viewModel)

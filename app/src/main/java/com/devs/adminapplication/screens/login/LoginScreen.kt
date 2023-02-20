@@ -1,8 +1,6 @@
 package com.devs.adminapplication.screens
 
 import android.annotation.SuppressLint
-import android.app.Application
-import android.content.SharedPreferences
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
@@ -30,13 +28,10 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.preference.PreferenceManager
 import com.devs.adminapplication.R
 import com.devs.adminapplication.navigation.AdminScreens
-import com.devs.adminapplication.retrofit.Constants
 import com.devs.adminapplication.ui.theme.PrimaryDark
 import com.devs.adminapplication.screens.login.LoginViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -170,8 +165,11 @@ fun LoginScreen(
 //                    }
                 keyboardController?.hide()
                 viewModel.loginUser(email, password){
+//                    Log.d("LoginFlow", "transition start")
                     navController.navigate(AdminScreens.HomeScreen.name){
+//                        Log.d("LoginFlow", "transition start2")
                         popUpTo(AdminScreens.LoginScreen.name){
+//                            Log.d("LoginFlow", "transition start3")
                             inclusive=true
                         }
                     }

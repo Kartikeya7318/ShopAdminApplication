@@ -1,17 +1,13 @@
 package com.devs.adminapplication.screens.login
 
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.devs.adminapplication.MyPreference
+import com.devs.adminapplication.utils.MyPreference
 import com.devs.adminapplication.models.LoginRequest
 import com.devs.adminapplication.models.LoginResponse
-import com.devs.adminapplication.navigation.AdminNavigation
-import com.devs.adminapplication.navigation.AdminScreens
 import com.devs.adminapplication.repository.UserRepository
-import com.devs.adminapplication.retrofit.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -56,7 +52,7 @@ class LoginViewModel @Inject constructor(
 //                    editor.apply()
                     _token.value = loginResult.value?.token.toString()
                     Log.d("LoginFlow", "loginUser: " + _token.value)
-                    myPreferences.setStoredTag(_token.value)
+                    myPreferences.setStoredTag("Bearer "+_token.value)
                     Log.d("LoginFlow", "loginUser: saved " + myPreferences.getStoredTag())
                     home()
 //                    Toast.makeText(
