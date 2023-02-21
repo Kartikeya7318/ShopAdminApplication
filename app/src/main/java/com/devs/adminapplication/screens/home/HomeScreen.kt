@@ -2,21 +2,15 @@ package com.devs.adminapplication.screens.home
 
 import android.annotation.SuppressLint
 import android.util.Log
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Notifications
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -27,15 +21,9 @@ import androidx.navigation.NavController
 import com.devs.adminapplication.data.Categorylists
 import com.devs.adminapplication.models.DataOrException
 import com.devs.adminapplication.models.Products
-import com.devs.adminapplication.navigation.AdminScreens
 import com.devs.adminapplication.screens.componenents.Categories
-import com.devs.adminapplication.screens.navigationDrawer.DrawerBody
-import com.devs.adminapplication.screens.navigationDrawer.MenuItem
-import com.devs.adminapplication.ui.theme.PrimaryLight
-import com.devs.adminapplication.ui.theme.PrimaryText
-import kotlinx.coroutines.launch
 import com.devs.adminapplication.ui.theme.*
-import java.lang.Exception
+import kotlinx.coroutines.launch
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -52,87 +40,9 @@ fun HomeScreen(navController: NavController, homeViewModel: HomeViewModel = hilt
    val selectedState by homeViewModel.selectedState.collectAsState()
     Log.d("LoginFlow", "HomeScreen: "+ homeScreenState.data?.products.toString())
     Log.d("LoginFlow", "HomeScreen: "+ homeScreenState.e.toString())
-    Scaffold(
-        scaffoldState = scaffoldState,
-        topBar = {
-            AppBar {
-                scope.launch {
-                    scaffoldState.drawerState.open()
-                }
-            }
-        },
-        drawerGesturesEnabled = scaffoldState.drawerState.isOpen,
-        drawerContent = {
-            DrawerBody(
-                items = listOf(
-                    MenuItem(
-                        id = "home",
-                        title = "Home",
-                        contentDescription = "Go to home screen",
-                        icon = Icons.Default.Home,
-                        route = AdminScreens.HomeScreen.name
-                    ),
-                    MenuItem(
-                        id = "add",
-                        title = "Add Product",
-                        contentDescription = "Go to profile screen",
-                        icon = Icons.Default.Info,
-                        route = ""
-                    ),
+//    Menu(scaffoldState = scaffoldState, scope = scope, navController = rememberNavController( )) {
+//        AdminNavigation(startDestination = AdminScreens.HomeScreen.name, navController = navController as NavHostController)
 
-                    MenuItem(
-                        id = "remove",
-                        title = "Remove Product",
-                        contentDescription = "Statistics",
-                        icon = Icons.Default.Info,
-                        route = ""
-                    ),
-                    MenuItem(
-                        id = "edit",
-                        title = "Edit Product",
-                        contentDescription = "Get help",
-                        icon = Icons.Default.Info,
-                        route = ""
-                    ),
-                    MenuItem(
-                        id = "newOrders",
-                        title = "New Orders",
-                        contentDescription = "feedback",
-                        icon = Icons.Default.Info,
-                        route = ""
-                    ),
-                    MenuItem(
-                        id = "ongoingOrders",
-                        title = "Ongoing Orders",
-                        contentDescription = "Share",
-                        icon = Icons.Default.Info,
-                        route = ""
-                    ),
-                    MenuItem(
-                        id = "completedOrders",
-                        title = "Completed Orders",
-                        contentDescription = "Share",
-                        icon = Icons.Default.Info,
-                        route = ""
-                    ),
-                    MenuItem(
-                        id = "signout",
-                        title = "Sign Out",
-                        contentDescription = "Sign Out",
-                        icon = Icons.Default.Logout,
-                        route = ""
-                    ),
-                )
-            ) {
-                println("Clicked on ${it.title}")
-                navController.navigate(it.route)
-                scope.launch {
-                    scaffoldState.drawerState.close()
-                }
-
-            }
-        }
-    ) {
         Column(Modifier.padding(vertical = 0.dp)) {
 
             Categories(
@@ -154,7 +64,7 @@ fun HomeScreen(navController: NavController, homeViewModel: HomeViewModel = hilt
 
             }
         }
-    }
+//    }
 }
 
 @Composable

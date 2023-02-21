@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.devs.adminapplication.R
 import com.devs.adminapplication.navigation.AdminScreens
+import com.devs.adminapplication.navigation.Graph
 import com.devs.adminapplication.ui.theme.PrimaryDark
 import com.devs.adminapplication.screens.login.LoginViewModel
 
@@ -38,7 +39,7 @@ import com.devs.adminapplication.screens.login.LoginViewModel
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LoginScreen(
-    navController: NavController,
+    navController1: NavController,
     viewModel: LoginViewModel,
 
     ) {
@@ -155,24 +156,11 @@ fun LoginScreen(
                 .height(55.dp),
             shape = RoundedCornerShape(4.dp),
             onClick = {
-//                userLogging=true
-//                    viewModel.signInWithEmailAndPassword(email, password) {
-//                        navController.navigate(PbtScreens.HomeScreen.name){
-//                            popUpTo(PbtScreens.LoginScreen.name){
-//                                inclusive=true
-//                            }
-//                        }
-//                    }
                 keyboardController?.hide()
                 viewModel.loginUser(email, password){
 //                    Log.d("LoginFlow", "transition start")
-                    navController.navigate(AdminScreens.HomeScreen.name){
-//                        Log.d("LoginFlow", "transition start2")
-                        popUpTo(AdminScreens.LoginScreen.name){
-//                            Log.d("LoginFlow", "transition start3")
-                            inclusive=true
-                        }
-                    }
+                    navController1.popBackStack()
+                    navController1.navigate(Graph.HOME.name)
                 }
 
             },

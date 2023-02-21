@@ -9,9 +9,14 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 import androidx.preference.PreferenceManager
-import com.devs.adminapplication.navigation.AdminNavigation
+
 import com.devs.adminapplication.navigation.AdminScreens
+import com.devs.adminapplication.navigation.HomeNavGraph
+import com.devs.adminapplication.navigation.RootNavigationGraph
+import com.devs.adminapplication.screens.MainActivityScreen
+import com.devs.adminapplication.screens.navigationDrawer.Menu
 import com.devs.adminapplication.utils.Constants
 import com.devs.adminapplication.ui.theme.AdminApplicationTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,11 +40,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-//                    val currentUser=SessionManager.getToken(application.applicationContext)
-//                    Log.d("LoginFlow", "onCreate: ${currentUser.toString()}")
-//                    if (currentUser!=null)
-//                        AdminNavigation( startDestination =AdminScreens.HomeScreen.name,sharedpreferences=sharedpreferences )
-//                    else
+
 
                     Log.d("LoginFlow", "onCreate: "+ prefs.getString(Constants.USER_TOKEN,"ndjci"))
                     token=prefs.getString(Constants.USER_TOKEN,null)
@@ -47,11 +48,10 @@ class MainActivity : ComponentActivity() {
                     if (token!=null)
                         token=null
                     Log.d("LoginFlow", "onCreate: "+ token)
-                        AdminNavigation(
-                            startDestination =AdminScreens.LoginScreen.name
-                        )
 
-
+//                    MainActivityScreen()
+                    val navController1= rememberNavController()
+                    RootNavigationGraph(navController1 = navController1)
                     Log.d("LoginFlow", "Started")
 //                    LoginScreen(viewModel)
                 }
@@ -72,4 +72,5 @@ class MainActivity : ComponentActivity() {
             Greeting("Android")
         }
     }
+
 }

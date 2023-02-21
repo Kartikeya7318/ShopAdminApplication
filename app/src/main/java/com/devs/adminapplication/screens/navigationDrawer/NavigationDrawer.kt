@@ -1,5 +1,6 @@
 package com.devs.adminapplication.screens.navigationDrawer
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -11,12 +12,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,12 +27,16 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.devs.adminapplication.R
 import com.devs.adminapplication.navigation.AdminScreens
+import com.devs.adminapplication.ui.theme.PrimaryLight
 import com.devs.adminapplication.ui.theme.PrimaryText
 import com.devs.adminapplication.ui.theme.SecondaryText
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 
@@ -140,5 +146,144 @@ fun DrawerBody(
                 )
             }
         }
+    }
+}
+
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
+@Composable
+fun Menu(
+    scaffoldState: ScaffoldState,
+    scope: CoroutineScope,
+    navController: NavController,
+    contains: @Composable () -> Unit
+) {
+    Scaffold(
+        scaffoldState = scaffoldState,
+        topBar = {
+            AppBar {
+                scope.launch {
+                    scaffoldState.drawerState.open()
+                }
+            }
+        },
+        drawerGesturesEnabled = scaffoldState.drawerState.isOpen,
+        drawerContent = {
+            DrawerBody(
+                items = listOf(
+                    MenuItem(
+                        id = "home",
+                        title = "Home",
+                        contentDescription = "Go to home screen",
+                        icon = Icons.Default.Home,
+                        route = AdminScreens.HomeScreen.name
+                    ),
+                    MenuItem(
+                        id = "add",
+                        title = "Add Product",
+                        contentDescription = "Go to profile screen",
+                        icon = Icons.Default.Info,
+                        route = AdminScreens.AddProductScreen.name
+                    ),
+
+                    MenuItem(
+                        id = "remove",
+                        title = "Remove Product",
+                        contentDescription = "Statistics",
+                        icon = Icons.Default.Info,
+                        route = ""
+                    ),
+                    MenuItem(
+                        id = "edit",
+                        title = "Edit Product",
+                        contentDescription = "Get help",
+                        icon = Icons.Default.Info,
+                        route = ""
+                    ),
+                    MenuItem(
+                        id = "newOrders",
+                        title = "New Orders",
+                        contentDescription = "feedback",
+                        icon = Icons.Default.Info,
+                        route = ""
+                    ),
+                    MenuItem(
+                        id = "ongoingOrders",
+                        title = "Ongoing Orders",
+                        contentDescription = "Share",
+                        icon = Icons.Default.Info,
+                        route = ""
+                    ),
+                    MenuItem(
+                        id = "completedOrders",
+                        title = "Completed Orders",
+                        contentDescription = "Share",
+                        icon = Icons.Default.Info,
+                        route = ""
+                    ),
+                    MenuItem(
+                        id = "signout",
+                        title = "Sign Out",
+                        contentDescription = "Sign Out",
+                        icon = Icons.Default.Logout,
+                        route = ""
+                    ),
+                )
+            ) {
+                println("Clicked on ${it.title}")
+                navController.popBackStack()
+                navController.navigate(it.route){
+                    launchSingleTop=true
+                    restoreState=true
+                }
+                scope.launch {
+                    scaffoldState.drawerState.close()
+                }
+
+            }
+        }
+    ) {
+        contains()
+    }
+}
+
+@Composable
+fun AppBar(onMenuClick: () -> Unit) {
+    TopAppBar(
+        backgroundColor = PrimaryLight,
+        elevation = 0.dp,
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(end = 10.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            IconButton(onClick = onMenuClick) {
+                Icon(
+                    imageVector = Icons.Rounded.Menu,
+                    contentDescription = "Menu",
+                    modifier = Modifier.size(28.dp),
+                    tint = Color.Black
+                )
+            }
+
+            Text(
+                text = "Shop Admin Application",
+                fontFamily = FontFamily.Default,
+                fontWeight = FontWeight.Medium,
+                fontSize = 20.sp,
+                color = PrimaryText,
+            )
+            Icon(
+                imageVector = Icons.Rounded.Notifications,
+                contentDescription = "Notification",
+                modifier = Modifier.size(28.dp),
+                tint = Color.Black
+            )
+        }
+
+
     }
 }

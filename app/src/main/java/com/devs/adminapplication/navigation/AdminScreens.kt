@@ -2,5 +2,12 @@ package com.devs.adminapplication.navigation
 
 enum class AdminScreens {
     LoginScreen,
-    HomeScreen
+    HomeScreen,
+    AddProductScreen,
+    MainActivityScreen
+}
+enum class Graph {
+    ROOT,
+    AUTHENTICATION,
+    HOME
 }
