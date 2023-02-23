@@ -4,10 +4,12 @@ enum class AdminScreens {
     LoginScreen,
     HomeScreen,
     AddProductScreen,
-    MainActivityScreen
+    ProductInfoScreen
+
 }
 enum class Graph {
     ROOT,
     AUTHENTICATION,
-    HOME
+    HOME,
+    DETAILS
 }
