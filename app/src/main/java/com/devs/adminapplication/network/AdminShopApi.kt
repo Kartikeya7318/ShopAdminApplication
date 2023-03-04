@@ -1,12 +1,12 @@
 package com.devs.adminapplication.network
 
 
-import android.util.Log
-import com.devs.adminapplication.models.LoginRequest
-import com.devs.adminapplication.models.LoginResponse
-import com.devs.adminapplication.models.Products
+import com.devs.adminapplication.models.categories.CategoryList
+import com.devs.adminapplication.models.login.LoginRequest
+import com.devs.adminapplication.models.login.LoginResponse
+import com.devs.adminapplication.models.productResponse.Products
+import com.devs.adminapplication.models.subcategories.SubCategoryList
 import com.devs.adminapplication.utils.Constants
-import retrofit2.Call
 
 import retrofit2.Response
 import retrofit2.http.*
@@ -19,5 +19,18 @@ interface AdminShopApi {
     suspend fun getAllProducts(
         @Header("Authorization") token: String
     ): Products
+
+    @GET(Constants.CATEGORY_URL)
+    suspend fun getAllCategories(
+        @Header("Authorization") token: String
+    ): CategoryList
+
+    @GET(Constants.SUB_CATEGORY_URL)
+    suspend fun getAllSubCategories(
+        @Header("Authorization") token: String
+    ): SubCategoryList
+
+
+
 
 }

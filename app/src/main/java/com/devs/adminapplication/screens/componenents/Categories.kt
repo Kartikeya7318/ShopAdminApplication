@@ -13,6 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.devs.adminapplication.models.categories.Category
+import com.devs.adminapplication.models.util.ChipList
 
 import com.devs.adminapplication.ui.theme.PrimaryLight
 
@@ -20,7 +22,7 @@ import com.devs.adminapplication.ui.theme.PrimaryLight
 @Composable
 fun Categories(
     selected: String,
-    categoriesList: List<String>,
+    categoriesList: List<ChipList>?= emptyList(),
     onClick: (String) -> Unit
 ) {
     Row(
@@ -31,20 +33,22 @@ fun Categories(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
     ) {
-        for (category in categoriesList) {
-            Spacer(modifier = Modifier.width(10.dp))
+        if (categoriesList != null) {
+            for (category in categoriesList) {
+                Spacer(modifier = Modifier.width(10.dp))
 
-            FilterChip(
-                selected = selected == category,
-                elevation = FilterChipDefaults.filterChipElevation(4.dp),
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = PrimaryLight,
-                    containerColor = Color.White
-                ),
-                onClick = { onClick(category) },
-                border = FilterChipDefaults.filterChipBorder(Color.Transparent, borderWidth = 0.dp),
-                label = { Text(text = category,) }
-            )
+                FilterChip(
+                    selected = selected == category.id.toString(),
+                    elevation = FilterChipDefaults.filterChipElevation(4.dp),
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = PrimaryLight,
+                        containerColor = Color.White
+                    ),
+                    onClick = { onClick(category.id.toString()) },
+                    border = FilterChipDefaults.filterChipBorder(Color.Transparent, borderWidth = 0.dp),
+                    label = { Text(text = category.name,) }
+                )
+            }
         }
         Spacer(modifier = Modifier.width(4.dp))
     }

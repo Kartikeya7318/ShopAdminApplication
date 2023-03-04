@@ -3,7 +3,6 @@ package com.devs.adminapplication.screens.addProducts
 import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -20,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.devs.adminapplication.models.ProductInfo
+import com.devs.adminapplication.models.addProduct.ProductInfo
 import com.devs.adminapplication.screens.componenents.TextBox
 import com.devs.adminapplication.ui.theme.BorderColor
 import com.devs.adminapplication.ui.theme.PrimaryLight
@@ -30,7 +29,7 @@ fun ProductInfoScreen(
     navController: NavController,
     addProductViewModel: AddProductViewModel = hiltViewModel()
 ) {
-    val product:ProductInfo= ProductInfo()
+    val product: ProductInfo = ProductInfo()
     var productInfo :MutableList<ProductInfo> = emptyList<ProductInfo>().toMutableList()
     Column() {
 
@@ -89,7 +88,7 @@ fun ProductInfoScreen(
 @Composable
 fun TypeBox(i: Int, productInfo: MutableList<ProductInfo>, ) {
 
-    val product:ProductInfo= ProductInfo()
+    val product: ProductInfo = ProductInfo()
     Column(modifier = Modifier
         .border(width = 1.dp, shape = RoundedCornerShape(5.dp), color = BorderColor)
         .padding(

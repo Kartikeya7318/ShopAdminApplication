@@ -1,4 +1,4 @@
-package com.devs.adminapplication.models
+package com.devs.adminapplication.models.login
 
 import com.google.gson.annotations.SerializedName
 

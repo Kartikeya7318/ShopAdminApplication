@@ -186,15 +186,22 @@ fun Menu(
                     ),
 
                     MenuItem(
-                        id = "remove",
-                        title = "Remove Product",
+                        id = "category",
+                        title = "Add Category",
                         contentDescription = "Statistics",
                         icon = Icons.Default.Info,
                         route = ""
                     ),
                     MenuItem(
-                        id = "edit",
-                        title = "Edit Product",
+                        id = "sub category",
+                        title = "Add Sub Category",
+                        contentDescription = "Get help",
+                        icon = Icons.Default.Info,
+                        route = ""
+                    ),
+                    MenuItem(
+                        id = "brand",
+                        title = "Add Brand",
                         contentDescription = "Get help",
                         icon = Icons.Default.Info,
                         route = ""

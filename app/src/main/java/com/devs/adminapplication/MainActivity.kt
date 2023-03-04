@@ -49,9 +49,10 @@ class MainActivity : ComponentActivity() {
                         token=null
                     Log.d("LoginFlow", "onCreate: "+ token)
 
-//                    MainActivityScreen()
+//
                     val navController1= rememberNavController()
                     RootNavigationGraph(navController1 = navController1)
+//                    MainActivityScreen(navControllerRoot = navController1)
                     Log.d("LoginFlow", "Started")
 //                    LoginScreen(viewModel)
                 }

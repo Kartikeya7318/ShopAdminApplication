@@ -1,4 +1,4 @@
-package com.devs.adminapplication.models
+package com.devs.adminapplication.models.util
 
 import java.lang.Exception
 

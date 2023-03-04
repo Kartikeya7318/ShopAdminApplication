@@ -1,4 +1,4 @@
-package com.devs.adminapplication.models
+package com.devs.adminapplication.models.addProduct
 
 data class ProductAdd(
     var _name: String = "",

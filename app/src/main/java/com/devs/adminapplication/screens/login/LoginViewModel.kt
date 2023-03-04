@@ -5,8 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devs.adminapplication.utils.MyPreference
-import com.devs.adminapplication.models.LoginRequest
-import com.devs.adminapplication.models.LoginResponse
+import com.devs.adminapplication.models.login.LoginRequest
+import com.devs.adminapplication.models.login.LoginResponse
 import com.devs.adminapplication.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
