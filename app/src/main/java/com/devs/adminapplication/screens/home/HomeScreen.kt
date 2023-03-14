@@ -41,7 +41,8 @@ fun HomeScreen(navController: NavController, homeViewModel: HomeViewModel = hilt
     val homeScreenState = produceState<DataOrException<Products, Boolean, Exception>>(
         initialValue = DataOrException(loading = true)
     ) {
-        value = homeViewModel.getAllProductsLocal()
+//        value = homeViewModel.getAllProductsLocal()
+        value=homeViewModel.getAllProducts()
     }.value
     val selectedState by homeViewModel.selectedState.collectAsState()
     val productList = homeScreenState.data?.products?.filter { it.id == 1 }

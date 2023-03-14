@@ -40,7 +40,7 @@ class HomeViewModel @Inject constructor(
 
     suspend fun getProducts(
         productListCategory: String = _selectedState.value.productListCategory,
-        productListSubCategory: String = "All Categories"
+        productListSubCategory: String = "0"
     ): DataOrException<Products, Boolean, Exception> {
         _selectedState.value = _selectedState.value.copy(
             productListCategory = productListCategory,
@@ -53,8 +53,8 @@ class HomeViewModel @Inject constructor(
 
     suspend fun getAllProducts(): DataOrException<Products, Boolean, Exception> {
         _selectedState.value = _selectedState.value.copy(
-            productListCategory = "All Categories",
-            productListSubCategory = "All Categories"
+            productListCategory = "0",
+            productListSubCategory = "0"
         )
         Log.d("LoginFlow", "getAllProducts: " + myPreference.getStoredTag())
         return repository.getAllProducts(myPreference.getStoredTag())
