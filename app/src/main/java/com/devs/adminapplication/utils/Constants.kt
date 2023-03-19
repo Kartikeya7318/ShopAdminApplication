@@ -6,6 +6,7 @@ object Constants {
     const val BASE_URL = "http://34.201.27.120/stockmanagement/api/"
     const val LOGIN_URL = "auth/token"
     const val ALL_PRODUCT_URL = "product/1"
+    const val SUB_PRODUCT_URL = "product"
     const val POSTS_URL = "posts"
     const val USER_TOKEN = "user_token"
     const val USER_DATA = "user_data"

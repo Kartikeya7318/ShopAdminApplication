@@ -13,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.devs.adminapplication.models.categories.Category
 import com.devs.adminapplication.models.util.ChipList
 
 import com.devs.adminapplication.ui.theme.PrimaryLight

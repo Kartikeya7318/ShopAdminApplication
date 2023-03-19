@@ -12,6 +12,15 @@ import com.google.gson.Gson
 import javax.inject.Inject
 
 class ProductsRepository @Inject constructor(private val api: AdminShopApi,private val myPreferences: MyPreference) {
+    suspend fun getProducts(token: String,subCategoryId:String): DataOrException<Products, Boolean, Exception>{
+        val response=try {
+            Log.d("LoginFlow", "getAllProducts: "+token)
+            api.getProducts(token=token,subCategoryId=subCategoryId.toLong(), brandId = 0)
+        } catch (e:Exception){
+            return DataOrException(e=e)
+        }
+        return DataOrException(data = response)
+    }
     suspend fun getAllProducts(token:String): DataOrException<Products, Boolean, Exception> {
         val response=try {
             Log.d("LoginFlow", "getAllProducts: "+token)

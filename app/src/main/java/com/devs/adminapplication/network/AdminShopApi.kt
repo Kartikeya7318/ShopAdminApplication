@@ -30,6 +30,12 @@ interface AdminShopApi {
         @Header("Authorization") token: String
     ): SubCategoryList
 
+    @GET(Constants.SUB_PRODUCT_URL)
+    suspend fun getProducts(
+        @Header("Authorization") token: String,
+        @Query("subCategoryId") subCategoryId : Long, @Query("brandId") brandId: Long
+    ): Products
+
 
 
 
