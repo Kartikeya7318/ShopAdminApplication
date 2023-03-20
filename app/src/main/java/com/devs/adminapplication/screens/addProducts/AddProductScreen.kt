@@ -148,7 +148,8 @@ fun TextBoxSelectable(
     label: String,
     focusManager: FocusManager,
     expanded: MutableState<Boolean>,
-    suggestions: MutableList<ChipList>
+    suggestions: MutableList<ChipList>,
+    enabled : Boolean=true
 ) {
     val icon = if (expanded.value)
         Icons.Filled.KeyboardArrowUp
@@ -186,7 +187,8 @@ fun TextBoxSelectable(
             trailingIcon = {
                 Icon(icon, "contentDescription",
                     Modifier.clickable { expanded.value = !expanded.value })
-            }
+            },
+            enabled = enabled
         )
         DropdownMenu(
             expanded = expanded.value,

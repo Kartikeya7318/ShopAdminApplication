@@ -4,7 +4,8 @@ enum class AdminScreens {
     LoginScreen,
     HomeScreen,
     AddProductScreen,
-    ProductInfoScreen
+    ProductInfoScreen,
+    DetailsScreen
 
 }
 enum class Graph {

@@ -30,11 +30,11 @@ fun Categories(
             .horizontalScroll(rememberScrollState())
             .padding(start = 10.dp, top = 5.dp, bottom = 0.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         if (categoriesList != null) {
             for (category in categoriesList) {
-                Spacer(modifier = Modifier.width(10.dp))
+//                Spacer(modifier = Modifier.width(10.dp))
 
                 FilterChip(
                     selected = selected == category.id.toString(),

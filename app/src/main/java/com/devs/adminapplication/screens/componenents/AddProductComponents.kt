@@ -20,6 +20,7 @@ fun TextBox(
     name: MutableState<String>,
     label: String,
     focusManager: FocusManager,
+    enabled:Boolean=true
 
     ) {
     OutlinedTextField(
@@ -41,7 +42,8 @@ fun TextBox(
             focusedBorderColor = Color(0xFF00BCD4),
             cursorColor = Color(0xFF00BCD4),
             focusedLabelColor = Color(0xFF00ACC1)
-        )
+        ),
+        enabled = enabled
     )
 }
 

@@ -184,7 +184,7 @@ object Constants {
 }"""
     var CATEGORIES:MutableList<ChipList> = mutableListOf()
     var SUBCATEGORIES:MutableList<ChipList> = mutableListOf()
-    var BRAND:MutableList<ChipList> = mutableListOf(ChipList(id="1", name = "Hugo"))
+    var BRAND:MutableList<ChipList> = mutableListOf(ChipList(id="4", name = "Hugo"))
 
 
 }

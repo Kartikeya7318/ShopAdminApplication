@@ -53,7 +53,6 @@ fun ProductInfoScreen(
         Button(
             modifier = Modifier
                 .fillMaxWidth()
-
                 .padding(top = 10.dp, bottom = 20.dp, start = 15.dp, end = 15.dp)
                 .height(55.dp),
             shape = RoundedCornerShape(4.dp),
