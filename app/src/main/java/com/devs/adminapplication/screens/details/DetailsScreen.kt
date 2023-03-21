@@ -28,6 +28,7 @@ import coil.compose.rememberImagePainter
 import com.devs.adminapplication.models.addProduct.ProductInfo
 import com.devs.adminapplication.models.productResponse.Product
 import com.devs.adminapplication.models.productResponse.ProductDetail
+import com.devs.adminapplication.navigation.AdminScreens
 import com.devs.adminapplication.screens.addProducts.TextBoxSelectable
 import com.devs.adminapplication.screens.addProducts.TypeBox
 import com.devs.adminapplication.screens.componenents.TextBox
@@ -48,22 +49,30 @@ fun DetailsScreen(
 //    Text(text = productId.toString())
     val homeScreenState by homeViewModel.homeScreenState.collectAsState()
     val product = homeScreenState.products?.filter { product ->
-        product.id == productId?.toInt()
+            product.id == productId?.toInt()
+
     }
 //    Text(text = product.toString())
     val scaffoldState = rememberScaffoldState()
     var saveEnabled by remember {
         mutableStateOf(false)
     }
+    var openDialog by remember { mutableStateOf(false)  }
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
             DetailBar(
+                refreshState = {navController.popBackStack()
+                    navController.navigate(AdminScreens.DetailsScreen.name+ "/$productId")},
                 onBackClick = { navController.popBackStack() },
                 productId.toString(),
                 saveEnabled
             ) {
-                saveEnabled = !saveEnabled
+                if(saveEnabled){
+                    openDialog=true
+                }else {
+                    saveEnabled = !saveEnabled
+                }
             }
         },
 
@@ -95,60 +104,65 @@ fun DetailsScreen(
 
 
                 }
+
                 val CategoryMap = Constants.CATEGORIES.map { it.id to it.name }.toMap()
                 val SubCategoryMap = Constants.SUBCATEGORIES.map { it.id to it.name }.toMap()
                 val BrandMap = Constants.BRAND.map { it.id to it.name }.toMap()
 
                 val id = remember { mutableStateOf(product[0].id.toString()) }
                 val name = remember { mutableStateOf(product[0].productName) }
-                val categoryId =
-                    remember { mutableStateOf(CategoryMap[product[0].subCategory.categoryId.toString()].toString()) }
-                val subCategoryId =
-                    remember { mutableStateOf(SubCategoryMap[product[0].subCategory.id.toString()].toString()) }
-                val brandId =
-                    remember { mutableStateOf(BrandMap[product[0].brand.id.toString()].toString()) }
+                val categoryId = remember { mutableStateOf(CategoryMap[product[0].subCategory.categoryId.toString()].toString()) }
+                val subCategoryId = remember { mutableStateOf(SubCategoryMap[product[0].subCategory.id.toString()].toString()) }
+                val brandId = remember { mutableStateOf(BrandMap[product[0].brand.id.toString()].toString()) }
                 val focusManager = LocalFocusManager.current
                 val expanded1 = remember { mutableStateOf(false) }
                 val expanded2 = remember { mutableStateOf(false) }
                 val expanded3 = remember { mutableStateOf(false) }
+
                 TextBox(name = id, label = "ID", focusManager = focusManager, enabled = saveEnabled)
-                TextBox(
-                    name = name,
-                    label = "Name",
-                    focusManager = focusManager,
-                    enabled = saveEnabled
-                )
-                TextBoxSelectable(
-                    categoryId,
-                    "Category",
-                    focusManager,
-                    expanded1,
-                    Constants.CATEGORIES.subList(1, Constants.CATEGORIES.size),
-                    enabled = saveEnabled
-                )
-                TextBoxSelectable(
-                    subCategoryId,
-                    "Sub Category",
-                    focusManager,
-                    expanded2,
-                    Constants.SUBCATEGORIES.subList(1, Constants.SUBCATEGORIES.size),
-                    enabled = saveEnabled
-                )
-                TextBoxSelectable(
-                    brandId,
-                    "Brand",
-                    focusManager,
-                    expanded3,
-                    Constants.BRAND,
-                    enabled = saveEnabled
-                )
+                TextBox(name = name, label = "Name", focusManager = focusManager, enabled = saveEnabled)
+                TextBoxSelectable(categoryId, "Category", focusManager, expanded1, Constants.CATEGORIES.subList(1, Constants.CATEGORIES.size), enabled = saveEnabled)
+                TextBoxSelectable(subCategoryId, "Sub Category", focusManager, expanded2, Constants.SUBCATEGORIES.subList(1, Constants.SUBCATEGORIES.size), enabled = saveEnabled)
+                TextBoxSelectable(brandId,"Brand", focusManager, expanded3, Constants.BRAND, enabled = saveEnabled)
                 val productDetails=product[0].productDetails
                 Spacer(modifier = Modifier.size(10.dp))
                 var productInfo :MutableList<ProductDetail> = productDetails.toMutableList()
                 for(it in productDetails.indices) {
-
                     DetailBox(it,productInfo,saveEnabled)
                     Spacer(modifier = Modifier.size(10.dp))
+                }
+                if (openDialog) {
+
+                    AlertDialog(
+                        onDismissRequest = {
+
+                            openDialog = false
+                        },
+                        title = {
+                            Text(text = "Save Data Changes?")
+                        },
+                        text = {
+                            Text("All the product details will be updated")
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    openDialog = false
+                                    saveEnabled= false
+                                }) {
+                                Text("Yes")
+                            }
+                        },
+                        dismissButton = {
+                            Button(
+                                onClick = {
+                                    openDialog = false
+
+                                }) {
+                                Text("No")
+                            }
+                        }
+                    )
                 }
             }
         }
@@ -189,10 +203,12 @@ fun DetailBox(it: Int, productInfo: MutableList<ProductDetail>,enabled : Boolean
 
 @Composable
 fun DetailBar(
+    refreshState: ()-> Unit,
     onBackClick: () -> Unit,
     productId: String,
     saveEnabled: Boolean,
     editSaveClick: () -> Unit
+
 ) {
     TopAppBar(
         backgroundColor = PrimaryLight,
@@ -223,9 +239,25 @@ fun DetailBar(
                 color = PrimaryText,
             )
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                IconButton(onClick = refreshState) {
+                    Icon(
+                        imageVector = Icons.Rounded.History,
+                        contentDescription = "Done",
+                        modifier = Modifier.size(28.dp),
+                        tint = Color.Black
+                    )
+                }
+                IconButton(onClick = {  }) {
+                    Icon(
+                        imageVector = Icons.Rounded.Delete,
+                        contentDescription = "Done",
+                        modifier = Modifier.size(28.dp),
+                        tint = Color.Black
+                    )
+                }
 
                 if (saveEnabled) {
-                    IconButton(onClick = editSaveClick, enabled = saveEnabled) {
+                    IconButton(onClick = editSaveClick) {
                         Icon(
                             imageVector = Icons.Rounded.Done,
                             contentDescription = "Done",

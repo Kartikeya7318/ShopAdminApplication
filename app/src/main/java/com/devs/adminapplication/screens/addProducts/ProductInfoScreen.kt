@@ -87,7 +87,7 @@ fun ProductInfoScreen(
 @Composable
 fun TypeBox(i: Int, productInfo: MutableList<ProductInfo>, ) {
 
-    val product: ProductInfo = ProductInfo()
+    val product = ProductInfo()
     Column(modifier = Modifier
         .border(width = 1.dp, shape = RoundedCornerShape(5.dp), color = BorderColor)
         .padding(
@@ -101,9 +101,12 @@ fun TypeBox(i: Int, productInfo: MutableList<ProductInfo>, ) {
         TextBox(name = price, label = "Price", focusManager = LocalFocusManager.current)
         var size = remember { mutableStateOf("") }
         TextBox(name = size, label = "Size", focusManager = LocalFocusManager.current)
+        var quantity = remember { mutableStateOf("") }
+        TextBox(name = quantity, label = "Quantity", focusManager = LocalFocusManager.current)
         product.color=color.value
         product.price=price.value
         product.size=size.value
+        product.quantity=quantity.value
         productInfo[i] = product
     }
 }
