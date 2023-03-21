@@ -1,14 +1,11 @@
 package com.devs.adminapplication.screens.details
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.gestures.scrollable
+import android.util.Log
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -21,23 +18,20 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
-import com.devs.adminapplication.models.addProduct.ProductInfo
-import com.devs.adminapplication.models.productResponse.Product
 import com.devs.adminapplication.models.productResponse.ProductDetail
 import com.devs.adminapplication.navigation.AdminScreens
 import com.devs.adminapplication.screens.addProducts.TextBoxSelectable
-import com.devs.adminapplication.screens.addProducts.TypeBox
 import com.devs.adminapplication.screens.componenents.TextBox
 import com.devs.adminapplication.screens.home.HomeViewModel
 import com.devs.adminapplication.ui.theme.BorderColor
 import com.devs.adminapplication.ui.theme.PrimaryLight
 import com.devs.adminapplication.ui.theme.PrimaryText
 import com.devs.adminapplication.utils.Constants
-
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -49,7 +43,7 @@ fun DetailsScreen(
 //    Text(text = productId.toString())
     val homeScreenState by homeViewModel.homeScreenState.collectAsState()
     val product = homeScreenState.products?.filter { product ->
-            product.id == productId?.toInt()
+        product.id == productId?.toInt()
 
     }
 //    Text(text = product.toString())
@@ -57,20 +51,22 @@ fun DetailsScreen(
     var saveEnabled by remember {
         mutableStateOf(false)
     }
-    var openDialog by remember { mutableStateOf(false)  }
+    var openDialog by remember { mutableStateOf(false) }
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
             DetailBar(
-                refreshState = {navController.popBackStack()
-                    navController.navigate(AdminScreens.DetailsScreen.name+ "/$productId")},
+                refreshState = {
+                    navController.popBackStack()
+                    navController.navigate(AdminScreens.DetailsScreen.name + "/$productId")
+                },
                 onBackClick = { navController.popBackStack() },
                 productId.toString(),
                 saveEnabled
             ) {
-                if(saveEnabled){
-                    openDialog=true
-                }else {
+                if (saveEnabled) {
+                    openDialog = true
+                } else {
                     saveEnabled = !saveEnabled
                 }
             }
@@ -111,26 +107,55 @@ fun DetailsScreen(
 
                 val id = remember { mutableStateOf(product[0].id.toString()) }
                 val name = remember { mutableStateOf(product[0].productName) }
-                val categoryId = remember { mutableStateOf(CategoryMap[product[0].subCategory.categoryId.toString()].toString()) }
-                val subCategoryId = remember { mutableStateOf(SubCategoryMap[product[0].subCategory.id.toString()].toString()) }
-                val brandId = remember { mutableStateOf(BrandMap[product[0].brand.id.toString()].toString()) }
+                val categoryId =
+                    remember { mutableStateOf(CategoryMap[product[0].subCategory.categoryId.toString()].toString()) }
+                val subCategoryId =
+                    remember { mutableStateOf(SubCategoryMap[product[0].subCategory.id.toString()].toString()) }
+                val brandId =
+                    remember { mutableStateOf(BrandMap[product[0].brand.id.toString()].toString()) }
                 val focusManager = LocalFocusManager.current
                 val expanded1 = remember { mutableStateOf(false) }
                 val expanded2 = remember { mutableStateOf(false) }
                 val expanded3 = remember { mutableStateOf(false) }
 
                 TextBox(name = id, label = "ID", focusManager = focusManager, enabled = saveEnabled)
-                TextBox(name = name, label = "Name", focusManager = focusManager, enabled = saveEnabled)
-                TextBoxSelectable(categoryId, "Category", focusManager, expanded1, Constants.CATEGORIES.subList(1, Constants.CATEGORIES.size), enabled = saveEnabled)
-                TextBoxSelectable(subCategoryId, "Sub Category", focusManager, expanded2, Constants.SUBCATEGORIES.subList(1, Constants.SUBCATEGORIES.size), enabled = saveEnabled)
-                TextBoxSelectable(brandId,"Brand", focusManager, expanded3, Constants.BRAND, enabled = saveEnabled)
-                val productDetails=product[0].productDetails
+                TextBox(
+                    name = name,
+                    label = "Name",
+                    focusManager = focusManager,
+                    enabled = saveEnabled
+                )
+                TextBoxSelectable(
+                    categoryId,
+                    "Category",
+                    focusManager,
+                    expanded1,
+                    Constants.CATEGORIES.subList(1, Constants.CATEGORIES.size),
+                    enabled = saveEnabled
+                )
+                TextBoxSelectable(
+                    subCategoryId,
+                    "Sub Category",
+                    focusManager,
+                    expanded2,
+                    Constants.SUBCATEGORIES.subList(1, Constants.SUBCATEGORIES.size),
+                    enabled = saveEnabled
+                )
+                TextBoxSelectable(
+                    brandId,
+                    "Brand",
+                    focusManager,
+                    expanded3,
+                    Constants.BRAND,
+                    enabled = saveEnabled
+                )
+                val productDetails = product[0].productDetails
                 Spacer(modifier = Modifier.size(10.dp))
-                var productInfo :MutableList<ProductDetail> = productDetails.toMutableList()
-                for(it in productDetails.indices) {
-                    DetailBox(it,productInfo,saveEnabled)
-                    Spacer(modifier = Modifier.size(10.dp))
-                }
+                var productInfo: MutableList<ProductDetail> = productDetails.toMutableList()
+//                for(it in productDetails.indices) {
+//                    DetailBox(it,productInfo,saveEnabled)
+//                    Spacer(modifier = Modifier.size(10.dp))
+//                }
                 if (openDialog) {
 
                     AlertDialog(
@@ -148,7 +173,7 @@ fun DetailsScreen(
                             Button(
                                 onClick = {
                                     openDialog = false
-                                    saveEnabled= false
+                                    saveEnabled = false
                                 }) {
                                 Text("Yes")
                             }
@@ -164,38 +189,153 @@ fun DetailsScreen(
                         }
                     )
                 }
+                Table(productDetails, saveEnabled)
+                Spacer(modifier = Modifier.size(30.dp))
+//                cell(text = "25")
             }
         }
 
     }
 }
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
-fun DetailBox(it: Int, productInfo: MutableList<ProductDetail>,enabled : Boolean) {
-    Column(modifier = Modifier
-        .border(width = 1.dp, shape = RoundedCornerShape(5.dp), color = BorderColor)
-        .padding(
-            start = 15.dp, top = 10.dp,
-            end = 15.dp, bottom = 10.dp
-        )) {
+private fun Table(productDetails: List<ProductDetail>, saveEnabled: Boolean) {
+    val colors = mutableListOf<String>()
+    val sizes = listOf<String>("S", "M", "L", "XL", "L")
+    for (it in productDetails.indices) {
+        val color = productDetails[it].color
+//        val size = productDetails[it].size
+        if (!colors.contains(color)) colors.add(color)
+//        if (!sizes.contains(size)) sizes.add(size)
+    }
+    Log.d("listupdate", "DetailsScreen: " + colors)
+    Log.d("listupdate", "DetailsScreen: " + sizes)
+
+
+    Row(
+        modifier = Modifier
+            .border(
+                width = 1.dp,
+                color = TextFieldDefaults
+                    .outlinedTextFieldColors()
+                    .placeholderColor(
+                        enabled = saveEnabled
+                    ).value,
+                shape = RoundedCornerShape(5.dp)
+            )
+            .padding(5.dp)
+    ) {
+        Column {
+            cell("", width = 60.dp, saveEnabled = saveEnabled)
+            for (color in colors) {
+                cell(color, width = 60.dp, saveEnabled = saveEnabled)
+            }
+        }
+        Row() {
+            Column() {
+                Row {
+
+                    for (size in sizes) {
+                        cell(size, saveEnabled = saveEnabled)
+                    }
+                } //header size row
+                for (color in colors) {
+                    Row {
+
+                        for (size in sizes) {
+                            val l = productDetails.filter { product ->
+                                product.color == color && product.size == size
+                            }
+                            if (l.isNotEmpty()) {
+                                val quantity by remember {
+                                    mutableStateOf(l[0].remaningQuantaty.toString())
+                                }
+                                cell(
+                                    quantity,
+                                    saveEnabled = saveEnabled
+                                )
+                            } else {
+                                cell(saveEnabled = saveEnabled)
+                            }
+                        }
+                    }
+                }
+            }
+        } //scrollable row
+    }
+
+}
+
+@Composable
+fun cell(text: String = "0", height: Dp = 30.dp, width: Dp = 40.dp, saveEnabled: Boolean) {
+    Box(
+        modifier = Modifier
+            .width(60.dp)
+            .height(height)
+            .border(
+                width = 1.dp,
+                color = TextFieldDefaults
+                    .outlinedTextFieldColors()
+                    .placeholderColor(
+                        enabled = saveEnabled
+                    ).value,
+                shape = RectangleShape
+            ),
+
+        contentAlignment = Alignment.Center
+
+    ) {
+
+        Text(
+            text = text,
+            color = TextFieldDefaults
+                .outlinedTextFieldColors()
+                .textColor(enabled = saveEnabled).value,
+        )
+
+    }
+}
+
+
+@Composable
+fun DetailBox(it: Int, productInfo: MutableList<ProductDetail>, enabled: Boolean) {
+    Column(
+        modifier = Modifier
+            .border(width = 1.dp, shape = RoundedCornerShape(5.dp), color = BorderColor)
+            .padding(
+                start = 15.dp, top = 10.dp,
+                end = 15.dp, bottom = 10.dp
+            )
+    ) {
         var id = remember { mutableStateOf(productInfo[it].id.toString()) }
-        TextBox(name = id, label = "Id", focusManager = LocalFocusManager.current,enabled)
+        TextBox(name = id, label = "Id", focusManager = LocalFocusManager.current, enabled)
         var color = remember { mutableStateOf(productInfo[it].color) }
-        TextBox(name = color, label = "Color", focusManager = LocalFocusManager.current,enabled)
+        TextBox(name = color, label = "Color", focusManager = LocalFocusManager.current, enabled)
         var price = remember { mutableStateOf(productInfo[it].price.toString()) }
-        TextBox(name = price, label = "Price", focusManager = LocalFocusManager.current,enabled)
+        TextBox(name = price, label = "Price", focusManager = LocalFocusManager.current, enabled)
         var size = remember { mutableStateOf(productInfo[it].size) }
-        TextBox(name = size, label = "Size", focusManager = LocalFocusManager.current,enabled)
+        TextBox(name = size, label = "Size", focusManager = LocalFocusManager.current, enabled)
         var quantity = remember { mutableStateOf(productInfo[it].quantity.toString()) }
-        TextBox(name = quantity, label = "Quantity", focusManager = LocalFocusManager.current,enabled)
+        TextBox(
+            name = quantity,
+            label = "Quantity",
+            focusManager = LocalFocusManager.current,
+            enabled
+        )
         var remaining = remember { mutableStateOf(productInfo[it].remaningQuantaty.toString()) }
-        TextBox(name = remaining, label = "Remaining Quantity", focusManager = LocalFocusManager.current,enabled)
-        productInfo[it].color=color.value
-        productInfo[it].price=price.value.toDouble()
-        productInfo[it].size=size.value
-        productInfo[it].id=id.value.toInt()
-        productInfo[it].quantity=quantity.value.toInt()
-        productInfo[it].remaningQuantaty=quantity.value.toInt()
+        TextBox(
+            name = remaining,
+            label = "Remaining Quantity",
+            focusManager = LocalFocusManager.current,
+            enabled
+        )
+        productInfo[it].color = color.value
+        productInfo[it].price = price.value.toDouble()
+        productInfo[it].size = size.value
+        productInfo[it].id = id.value.toInt()
+        productInfo[it].quantity = quantity.value.toInt()
+        productInfo[it].remaningQuantaty = quantity.value.toInt()
 
     }
 }
@@ -203,12 +343,11 @@ fun DetailBox(it: Int, productInfo: MutableList<ProductDetail>,enabled : Boolean
 
 @Composable
 fun DetailBar(
-    refreshState: ()-> Unit,
+    refreshState: () -> Unit,
     onBackClick: () -> Unit,
     productId: String,
     saveEnabled: Boolean,
     editSaveClick: () -> Unit
-
 ) {
     TopAppBar(
         backgroundColor = PrimaryLight,
@@ -247,7 +386,7 @@ fun DetailBar(
                         tint = Color.Black
                     )
                 }
-                IconButton(onClick = {  }) {
+                IconButton(onClick = { }) {
                     Icon(
                         imageVector = Icons.Rounded.Delete,
                         contentDescription = "Done",

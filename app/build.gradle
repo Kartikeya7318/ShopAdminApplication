@@ -99,4 +99,7 @@ dependencies {
     //material icons - use with caution!
     implementation "androidx.compose.material:material-icons-extended:1.1.1"
 
+    //datatable
+    implementation 'androidx.ui:ui-material:0.1.0-dev04'
+
 }
