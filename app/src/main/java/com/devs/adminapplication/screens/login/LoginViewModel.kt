@@ -43,24 +43,12 @@ class LoginViewModel @Inject constructor(
                 val response = userRepo.loginUser(loginRequest = loginRequest)
                 if (response?.code() == 200) {
                     loginResult.value = response.body()
-//                    val applicationContext = getApplication<Application>().applicationContext
-//                    SessionManager.saveAuthToken(applicationContext, loginResult.value?.token.toString())
                     _loading.value = false
-
-//                    val editor = sharedpreferences.edit()
-//                    editor.putString(Constants.USER_TOKEN,loginResult.value?.token.toString() )
-//                    editor.apply()
                     _token.value = loginResult.value?.token.toString()
                     Log.d("LoginFlow", "loginUser: " + _token.value)
                     myPreferences.setStoredTag("Bearer "+_token.value)
                     Log.d("LoginFlow", "loginUser: saved " + myPreferences.getStoredTag())
                     home()
-//                    Toast.makeText(
-//                        applicationContext,
-//                        loginResult.value?.token.toString(),
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-
                 } else {
                     if (response != null) {
                         _failReason.value = response.message()

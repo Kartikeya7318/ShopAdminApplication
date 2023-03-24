@@ -76,7 +76,8 @@ fun HomeScreen(navController: NavController, homeViewModel: HomeViewModel = hilt
             categoriesList = catList
         ) {
             scope.launch {
-                homeViewModel.getProducts(productListCategory = it)
+                homeViewModel.updateProductListCategory(productListCategory = it)
+//                homeViewModel.getProducts(productListCategory = it)
             }
 
         }
@@ -108,7 +109,7 @@ private fun itembox(productList: List<Product>?,onClick: (String) -> Unit) {
             Text(text = "No Product Available")
         } else {
             val newList = ArrayList(productList)
-            newList.add(productList.get(0))
+//            newList.add(productList.get(0))
             Log.d("listupdate", "itembox: " + productList.size)
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2), horizontalArrangement = Arrangement.spacedBy(10.dp)

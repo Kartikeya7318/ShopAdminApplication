@@ -43,7 +43,7 @@ fun ProductInfoScreen(
                 end = 15.dp
             )
             .verticalScroll(rememberScrollState())) {
-            for(it in 0 until addProductViewModel.product._nProducts) {
+            for(it in 0 until addProductViewModel.nProducts) {
                 productInfo.add(product)
                 TypeBox(it, productInfo)
 
@@ -66,7 +66,7 @@ fun ProductInfoScreen(
 //                Log.d("LoginFlow", "AddProductScreen: " + nProducts.value)
 
                 Log.d("LoginFlow", "ProductInfo: "+productInfo.toString())
-
+                addProductViewModel.setProductDetails(productInfo)
 
             },
             enabled = true,

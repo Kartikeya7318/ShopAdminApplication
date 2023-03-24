@@ -38,6 +38,7 @@ import com.devs.adminapplication.navigation.AdminScreens
 
 import com.devs.adminapplication.screens.componenents.TextBox
 import com.devs.adminapplication.screens.componenents.isInteger
+import com.devs.adminapplication.screens.home.HomeViewModel
 import com.devs.adminapplication.ui.theme.PrimaryLight
 import com.devs.adminapplication.utils.Constants
 
@@ -46,11 +47,12 @@ import com.devs.adminapplication.utils.Constants
 @Composable
 fun AddProductScreen(
     navController: NavController,
-    addProductViewModel: AddProductViewModel = hiltViewModel()
+    addProductViewModel: AddProductViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel
 ) {
     val name = remember { mutableStateOf("") }
     val categoryId = remember { mutableStateOf("") }
-    val subCategoryId = remember { mutableStateOf("") }
+    var subCategoryId = remember { mutableStateOf("") }
     val brandId = remember { mutableStateOf("") }
     val quantity = remember { mutableStateOf("") }
     val price = remember { mutableStateOf("") }
@@ -59,8 +61,26 @@ fun AddProductScreen(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val navController3 = rememberNavController()
+    val homeScreenState by homeViewModel.homeScreenState.collectAsState()
+    val catList: MutableList<ChipList> = mutableListOf()
+    for (i in 0 until (homeScreenState.categories.size)) {
+        val chipList = ChipList(
+            id = homeScreenState.categories[i].id.toString(),
+            name = homeScreenState.categories[i].name.toString()
+        )
+        catList.add(chipList)
+        Constants.CATEGORIES = catList
+    }
+    val subCatList: MutableList<ChipList> = mutableListOf()
+    for (i in 0 until (homeScreenState.subCategories.size)) {
+        val chipList = ChipList(
+            id = homeScreenState.subCategories[i].id.toString(),
+            name = homeScreenState.subCategories[i].name.toString()
+        )
+        subCatList.add(chipList)
 
-
+        Constants.SUBCATEGORIES = subCatList
+    }
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -77,11 +97,14 @@ fun AddProductScreen(
         val expanded2 = remember { mutableStateOf(false) }
         val expanded3 = remember { mutableStateOf(false) }
         TextBox(name, "Name", focusManager)
-        TextBoxSelectable(categoryId, "Category", focusManager, expanded1,Constants.CATEGORIES.subList(1,Constants.CATEGORIES.size))
-        TextBoxSelectable(subCategoryId, "Sub Category", focusManager, expanded2, Constants.SUBCATEGORIES.subList(1,Constants.SUBCATEGORIES.size))
+        TextBoxSelectable(categoryId, "Category", focusManager, expanded1, catList) { id ->
+            homeViewModel.updateProductListCategory(id)
+            subCategoryId.value = ""
+        }
+        TextBoxSelectable(subCategoryId, "Sub Category", focusManager, expanded2, subCatList)
         TextBoxSelectable(brandId, "Brand", focusManager, expanded3, Constants.BRAND)
-        TextBox(quantity, "Quantity", focusManager)
-        TextBox(price, "Price", focusManager)
+//        TextBox(quantity, "Quantity", focusManager)
+        TextBox(price, "Price Range", focusManager)
         TextBox(nProducts, "Number of Types", focusManager)
 
 
@@ -96,9 +119,9 @@ fun AddProductScreen(
                 val CategoryMap = Constants.CATEGORIES.map { it.name to it.id }.toMap()
                 val SubCategoryMap = Constants.SUBCATEGORIES.map { it.name to it.id }.toMap()
                 val BrandMap = Constants.BRAND.map { it.name to it.id }.toMap()
-                categoryId.value= CategoryMap[categoryId.value].toString()
-                subCategoryId.value=SubCategoryMap[subCategoryId.value].toString()
-                brandId.value=BrandMap[brandId.value].toString()
+                categoryId.value = CategoryMap[categoryId.value].toString()
+                subCategoryId.value = SubCategoryMap[subCategoryId.value].toString()
+                brandId.value = BrandMap[brandId.value].toString()
                 Log.d("LoginFlow", "AddProductScreen: " + name.value)
                 Log.d("LoginFlow", "AddProductScreen: " + categoryId.value)
                 Log.d("LoginFlow", "AddProductScreen: " + subCategoryId.value)
@@ -111,7 +134,6 @@ fun AddProductScreen(
                         name = name.value,
                         subCategoryId = subCategoryId.value,
                         brandId = brandId.value,
-                        quantity = quantity.value,
                         price = price.value,
                         nProducts = nProducts.value.toInt()
                     )
@@ -149,7 +171,8 @@ fun TextBoxSelectable(
     focusManager: FocusManager,
     expanded: MutableState<Boolean>,
     suggestions: MutableList<ChipList>,
-    enabled : Boolean=true
+    enabled: Boolean = true,
+    onValueChange: (id: String) -> Unit = { }
 ) {
     val icon = if (expanded.value)
         Icons.Filled.KeyboardArrowUp
@@ -194,12 +217,13 @@ fun TextBoxSelectable(
             expanded = expanded.value,
             onDismissRequest = { expanded.value = false },
             modifier = Modifier
-                .width(with(LocalDensity.current){textfieldSize.width.toDp()})
+                .width(with(LocalDensity.current) { textfieldSize.width.toDp() })
         ) {
             suggestions.forEach { label ->
                 DropdownMenuItem(onClick = {
                     name.value = label.name
                     expanded.value = false
+                    onValueChange(label.id)
                 }) {
                     Text(text = label.name)
                 }

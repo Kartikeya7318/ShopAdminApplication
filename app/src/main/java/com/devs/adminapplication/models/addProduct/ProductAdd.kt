@@ -1,12 +1,12 @@
 package com.devs.adminapplication.models.addProduct
 
+import com.google.gson.annotations.SerializedName
+
 data class ProductAdd(
-    var _name: String = "",
-    var _subCategoryId: String = "",
-    var _brandId: String = "",
-    var _quantity: String = "",
-    var _price: String = "",
-    var _nProducts: Int = 0,
-    var productInfo:List<ProductInfo> =emptyList()
+    @SerializedName("name") var name: String = "",
+    @SerializedName("subCategoryId")var subCategoryId: String = "",
+    @SerializedName("brandId")var brandId: String = "",
+    @SerializedName("price")var price: String = "",
+    @SerializedName("productInfo")var productInfo:List<ProductInfo> =emptyList()
 
 )

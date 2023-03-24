@@ -7,10 +7,13 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.devs.adminapplication.screens.addBrands.AddBrandScreen
+import com.devs.adminapplication.screens.addCategories.AddCategoryScreen
 import com.devs.adminapplication.screens.addProducts.AddProductScreen
 import com.devs.adminapplication.screens.addProducts.AddProductViewModel
 
 import com.devs.adminapplication.screens.addProducts.ProductInfoScreen
+import com.devs.adminapplication.screens.addSubCategories.AddSubCategoryScreen
 import com.devs.adminapplication.screens.details.DetailsScreen
 import com.devs.adminapplication.screens.home.HomeScreen
 import com.devs.adminapplication.screens.home.HomeViewModel
@@ -31,12 +34,23 @@ fun HomeNavGraph(navController2: NavHostController, navControllerRoot: NavHostCo
         composable(AdminScreens.AddProductScreen.name) {
             AddProductScreen(
                 navController = navController2,
-                addProductViewModel = addProductViewModel
+                addProductViewModel = addProductViewModel,
+                homeViewModel=homeViewModel
             )
         }
         composable(AdminScreens.ProductInfoScreen.name) {
             ProductInfoScreen(navController = navController2, addProductViewModel)
         }
+        composable(AdminScreens.AddBrandScreen.name){
+            AddBrandScreen()
+        }
+        composable(AdminScreens.AddCategoryScreen.name){
+            AddCategoryScreen()
+        }
+        composable(AdminScreens.AddSubCategoryScreen.name){
+            AddSubCategoryScreen()
+        }
+
 
 
 

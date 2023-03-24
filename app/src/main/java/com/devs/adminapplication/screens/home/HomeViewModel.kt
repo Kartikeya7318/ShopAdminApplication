@@ -28,12 +28,11 @@ data class HomeScreenState(
     var subCategories: List<SubCategory> = emptyList(),
     var products: List<Product>? = emptyList(),
 
-)
+    )
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val repository: ProductsRepository,
-    private val myPreference: MyPreference
+    private val repository: ProductsRepository, private val myPreference: MyPreference
 ) : ViewModel() {
     private val _homeScreenState = MutableStateFlow(HomeScreenState())
     val homeScreenState get() = _homeScreenState.asStateFlow()
@@ -44,14 +43,19 @@ class HomeViewModel @Inject constructor(
         getProducts()
     }
 
+    fun updateProductListCategory(productListCategory: String){
+        _homeScreenState.value = _homeScreenState.value.copy(
+            productListCategory = productListCategory
+        )
+        getAllSubCategories()
+    }
     fun getProducts(
         productListCategory: String = _homeScreenState.value.productListCategory,
-        productListSubCategory: String = "15"
+        productListSubCategory: String = _homeScreenState.value.productListSubCategory
     ) {
         viewModelScope.launch {
-            val res=repository.getProducts(
-                token = myPreference.getStoredTag(),
-                subCategoryId = productListSubCategory
+            val res = repository.getProducts(
+                token = myPreference.getStoredTag(), subCategoryId = productListSubCategory
             )
 
             _homeScreenState.value = _homeScreenState.value.copy(
@@ -68,8 +72,7 @@ class HomeViewModel @Inject constructor(
 
     suspend fun getAllProducts(): DataOrException<Products, Boolean, Exception> {
         _homeScreenState.value = _homeScreenState.value.copy(
-            productListCategory = "1",
-            productListSubCategory = "15"
+            productListCategory = "1", productListSubCategory = "15"
         )
         Log.d("LoginFlow", "getAllProducts: " + myPreference.getStoredTag())
         return repository.getAllProducts(myPreference.getStoredTag())
@@ -77,8 +80,7 @@ class HomeViewModel @Inject constructor(
 
     suspend fun getAllProductsLocal(): DataOrException<Products, Boolean, Exception> {
         _homeScreenState.value = _homeScreenState.value.copy(
-            productListCategory = "1",
-            productListSubCategory = "15"
+            productListCategory = "1", productListSubCategory = "15"
         )
         return repository.getAllProductsLocal()
     }
@@ -86,15 +88,15 @@ class HomeViewModel @Inject constructor(
     fun getAllCategories() {
         viewModelScope.launch {
             val categories = repository.getAllCategories(myPreference.getStoredTag())
-            val category = Category(
-                id = 0,
-                name = "All Categories",
-                product = emptyList(),
-                status = "Active",
-                subCategory = emptyList()
-            )
+//            val category = Category(
+//                id = 0,
+//                name = "All Categories",
+//                product = emptyList(),
+//                status = "Active",
+//                subCategory = emptyList()
+//            )
             val finalList = mutableListOf<Category>()
-            finalList.add(category)
+//            finalList.add(category)
             categories.data?.let { finalList.addAll(it.categories) }
             categories.data?.categories = finalList
             _homeScreenState.value = _homeScreenState.value.copy(
@@ -103,24 +105,27 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-     fun getAllSubCategories() {
+    fun getAllSubCategories() {
         viewModelScope.launch {
             val subcategories = repository.getAllSubCategories(myPreference.getStoredTag())
-            val subcategory = SubCategory(
-                id = 0,
-                name = "All Categories",
-                status = "Active",
-                categoryId = 0,
-                url = ""
-
-            )
+//            val subcategory = SubCategory(
+//                id = 0,
+//                name = "All Categories",
+//                status = "Active",
+//                categoryId = 0,
+//                url = ""
+//
+//            )
             val finalList = mutableListOf<SubCategory>()
-            finalList.add(subcategory)
+//            finalList.add(subcategory)
             subcategories.data?.let { finalList.addAll(it.categories) }
             subcategories.data?.categories = finalList
-            _homeScreenState.value = _homeScreenState.value.copy(
-                subCategories = subcategories.data!!.categories
-            )
+            _homeScreenState.value =
+                _homeScreenState.value.copy(subCategories = subcategories.data!!.categories.filter { subCategory ->
+                    subCategory.categoryId == _homeScreenState.value.productListCategory.toInt()
+                })
+            _homeScreenState.value=_homeScreenState.value.copy(productListSubCategory = _homeScreenState.value.subCategories[0].id.toString())
+            getProducts()
         }
     }
 }

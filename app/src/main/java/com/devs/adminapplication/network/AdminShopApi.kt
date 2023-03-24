@@ -1,6 +1,8 @@
 package com.devs.adminapplication.network
 
 
+import com.devs.adminapplication.models.addProduct.AddProductResponse
+import com.devs.adminapplication.models.addProduct.ProductAdd
 import com.devs.adminapplication.models.categories.CategoryList
 import com.devs.adminapplication.models.login.LoginRequest
 import com.devs.adminapplication.models.login.LoginResponse
@@ -35,6 +37,9 @@ interface AdminShopApi {
         @Header("Authorization") token: String,
         @Query("subCategoryId") subCategoryId : Long, @Query("brandId") brandId: Long
     ): Products
+
+    @POST(Constants.LOGIN_URL)
+    suspend fun addProductToServer(@Body product : ProductAdd): Response<AddProductResponse>
 
 
 

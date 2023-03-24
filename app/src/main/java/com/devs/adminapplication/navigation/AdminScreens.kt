@@ -5,7 +5,10 @@ enum class AdminScreens {
     HomeScreen,
     AddProductScreen,
     ProductInfoScreen,
-    DetailsScreen
+    DetailsScreen,
+    AddCategoryScreen,
+    AddSubCategoryScreen,
+    AddBrandScreen
 
 }
 enum class Graph {

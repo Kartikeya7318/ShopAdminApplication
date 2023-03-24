@@ -190,21 +190,21 @@ fun Menu(
                         title = "Add Category",
                         contentDescription = "Statistics",
                         icon = Icons.Default.Info,
-                        route = ""
+                        route = AdminScreens.AddCategoryScreen.name
                     ),
                     MenuItem(
                         id = "sub category",
                         title = "Add Sub Category",
                         contentDescription = "Get help",
                         icon = Icons.Default.Info,
-                        route = ""
+                        route = AdminScreens.AddSubCategoryScreen.name
                     ),
                     MenuItem(
                         id = "brand",
                         title = "Add Brand",
                         contentDescription = "Get help",
                         icon = Icons.Default.Info,
-                        route = ""
+                        route = AdminScreens.AddBrandScreen.name
                     ),
                     MenuItem(
                         id = "newOrders",
