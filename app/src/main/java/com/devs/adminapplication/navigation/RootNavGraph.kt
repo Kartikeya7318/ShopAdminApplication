@@ -24,12 +24,14 @@ fun RootNavigationGraph(navController1: NavHostController) {
         composable(route = Graph.HOME.name) {
             MainActivityScreen(navControllerRoot=navController1)
         }
-        composable(AdminScreens.DetailsScreen.name + "/{id}",
-            arguments = listOf(navArgument(name = "id") { type = NavType.StringType })
+        composable(AdminScreens.DetailsScreen.name + "/{id}"+"/{subId}",
+            arguments = listOf(navArgument(name = "id") { type = NavType.StringType },
+                navArgument(name = "subId"){type= NavType.StringType}
+            )
         ) { backStackEntry ->
             val homeViewModel = hiltViewModel<HomeViewModel>()
             DetailsScreen(navController = navController1,
-                backStackEntry.arguments?.getString("id"),homeViewModel)
+                backStackEntry.arguments?.getString("id")!!,backStackEntry.arguments?.getString("subId")!!,homeViewModel)
         }
 
 

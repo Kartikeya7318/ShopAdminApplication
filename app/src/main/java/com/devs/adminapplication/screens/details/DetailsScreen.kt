@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -22,8 +23,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
 import com.devs.adminapplication.models.productResponse.ProductDetail
+import com.devs.adminapplication.models.util.ChipList
 import com.devs.adminapplication.navigation.AdminScreens
 import com.devs.adminapplication.screens.addProducts.TextBoxSelectable
 import com.devs.adminapplication.screens.componenents.TextBox
@@ -37,11 +41,13 @@ import com.devs.adminapplication.utils.Constants
 @Composable
 fun DetailsScreen(
     navController: NavHostController,
-    productId: String?,
+    productId: String,
+    subCategoryId: String,
     homeViewModel: HomeViewModel
 ) {
 //    Text(text = productId.toString())
     val homeScreenState by homeViewModel.homeScreenState.collectAsState()
+    homeViewModel.getProducts(productListSubCategory = subCategoryId)
     val product = homeScreenState.products?.filter { product ->
         product.id == productId?.toInt()
 
@@ -52,13 +58,32 @@ fun DetailsScreen(
         mutableStateOf(false)
     }
     var openDialog by remember { mutableStateOf(false) }
+    val catList: MutableList<ChipList> = mutableListOf()
+    for (i in 0 until (homeScreenState.categories.size)) {
+        val chipList = ChipList(
+            id = homeScreenState.categories[i].id.toString(),
+            name = homeScreenState.categories[i].name.toString()
+        )
+        catList.add(chipList)
+        Constants.CATEGORIES = catList
+    }
+    val subCatList: MutableList<ChipList> = mutableListOf()
+    for (i in 0 until (homeScreenState.subCategories.size)) {
+        val chipList = ChipList(
+            id = homeScreenState.subCategories[i].id.toString(),
+            name = homeScreenState.subCategories[i].name.toString()
+        )
+        subCatList.add(chipList)
+
+        Constants.SUBCATEGORIES = subCatList
+    }
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
             DetailBar(
                 refreshState = {
                     navController.popBackStack()
-                    navController.navigate(AdminScreens.DetailsScreen.name + "/$productId")
+                    navController.navigate(AdminScreens.DetailsScreen.name + "/$productId"+"/$subCategoryId")
                 },
                 onBackClick = { navController.popBackStack() },
                 productId.toString(),
@@ -90,11 +115,13 @@ fun DetailsScreen(
                 ) {
 
                     Image(
-                        painter = rememberImagePainter(data = product.get(0).productImg.get(0).url,
-                            builder = {
-                                crossfade(true)
-                                transformations()
-                            }),
+                        painter = rememberAsyncImagePainter(
+                            ImageRequest.Builder(LocalContext.current)
+                                .data(data = product.get(0).productImg.get(0).url).apply(block = fun ImageRequest.Builder.() {
+                                    crossfade(true)
+                                    transformations()
+                                }).build()
+                        ),
                         contentDescription = "Product Image"
                     )
 
@@ -130,15 +157,18 @@ fun DetailsScreen(
                     "Category",
                     focusManager,
                     expanded1,
-                    Constants.CATEGORIES.subList(1, Constants.CATEGORIES.size),
+                    catList,
                     enabled = saveEnabled
-                )
+                ) { id ->
+                    homeViewModel.updateSubCatList(id)
+                    subCategoryId.value = ""
+                }
                 TextBoxSelectable(
                     subCategoryId,
                     "Sub Category",
                     focusManager,
                     expanded2,
-                    Constants.SUBCATEGORIES.subList(1, Constants.SUBCATEGORIES.size),
+                    subCatList,
                     enabled = saveEnabled
                 )
                 TextBoxSelectable(

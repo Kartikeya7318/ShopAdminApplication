@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.text.isDigitsOnly
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.devs.adminapplication.models.addProduct.ProductInfo
@@ -66,8 +67,8 @@ fun ProductInfoScreen(
 //                Log.d("LoginFlow", "AddProductScreen: " + nProducts.value)
 
                 Log.d("LoginFlow", "ProductInfo: "+productInfo.toString())
-                addProductViewModel.setProductDetails(productInfo)
-
+//                addProductViewModel.setProductDetails(productInfo)
+                addProductViewModel.addProductToServer(productInfo)
             },
             enabled = true,
             colors = ButtonDefaults.buttonColors(
@@ -104,9 +105,16 @@ fun TypeBox(i: Int, productInfo: MutableList<ProductInfo>, ) {
         var quantity = remember { mutableStateOf("") }
         TextBox(name = quantity, label = "Quantity", focusManager = LocalFocusManager.current)
         product.color=color.value
-        product.price=price.value
         product.size=size.value
-        product.quantity=quantity.value
+        try {
+            product.price = price.value.toInt()
+            product.quantity =  quantity.value.toInt()
+        }catch (e: NumberFormatException) {
+            // handle the exception here
+//            Log.e("MyApp", "Failed to convert '$string' to an integer", e)
+            product.price=0
+            product.quantity=0
+        }
         productInfo[i] = product
     }
 }

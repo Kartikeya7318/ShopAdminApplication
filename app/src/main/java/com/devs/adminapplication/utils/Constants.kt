@@ -4,6 +4,7 @@ import com.devs.adminapplication.models.util.ChipList
 
 object Constants {
     const val BASE_URL = "http://34.201.27.120/stockmanagement/api/"
+    const val ADD_PRODUCT_URL= "product"
     const val LOGIN_URL = "auth/token"
     const val ALL_PRODUCT_URL = "product/1"
     const val SUB_PRODUCT_URL = "product"

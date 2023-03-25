@@ -77,7 +77,7 @@ fun HomeScreen(navController: NavController, homeViewModel: HomeViewModel = hilt
         ) {
             scope.launch {
                 homeViewModel.updateProductListCategory(productListCategory = it)
-//                homeViewModel.getProducts(productListCategory = it)
+
             }
 
         }
@@ -92,7 +92,7 @@ fun HomeScreen(navController: NavController, homeViewModel: HomeViewModel = hilt
         }
 
         itembox(homeScreenState.products){id->
-            navController.navigate(route = AdminScreens.DetailsScreen.name+ "/$id")
+            navController.navigate(route = AdminScreens.DetailsScreen.name+ "/$id"+"/${homeScreenState.productListSubCategory}")
         }
 
     }

@@ -9,6 +9,8 @@ import com.devs.adminapplication.models.login.LoginResponse
 import com.devs.adminapplication.models.productResponse.Products
 import com.devs.adminapplication.models.subcategories.SubCategoryList
 import com.devs.adminapplication.utils.Constants
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 
 import retrofit2.Response
 import retrofit2.http.*
@@ -38,10 +40,18 @@ interface AdminShopApi {
         @Query("subCategoryId") subCategoryId : Long, @Query("brandId") brandId: Long
     ): Products
 
-    @POST(Constants.LOGIN_URL)
-    suspend fun addProductToServer(@Body product : ProductAdd): Response<AddProductResponse>
+    @POST(Constants.ADD_PRODUCT_URL)
+    suspend fun addProductToServer(@Body product : ProductAdd,@Part image: MultipartBody.Part): AddProductResponse
 
 
+
+    @POST("product")
+    @Multipart
+    suspend fun uploadProduct(
+        @Header("Authorization") token: String,
+        @Part file: MultipartBody.Part,
+        @Part("req") requestBody: RequestBody
+    )
 
 
 }

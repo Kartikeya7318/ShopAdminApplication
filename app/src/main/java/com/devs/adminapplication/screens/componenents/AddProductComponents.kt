@@ -24,7 +24,7 @@ fun TextBox(
 
     ) {
     OutlinedTextField(
-        value = name.value,
+        value = name.value.toString(),
         onValueChange = { name.value = it },
         label = { Text(text = label) },
         modifier = Modifier

@@ -70,33 +70,10 @@ class HomeViewModel @Inject constructor(
     }
 
 
-    suspend fun getAllProducts(): DataOrException<Products, Boolean, Exception> {
-        _homeScreenState.value = _homeScreenState.value.copy(
-            productListCategory = "1", productListSubCategory = "15"
-        )
-        Log.d("LoginFlow", "getAllProducts: " + myPreference.getStoredTag())
-        return repository.getAllProducts(myPreference.getStoredTag())
-    }
-
-    suspend fun getAllProductsLocal(): DataOrException<Products, Boolean, Exception> {
-        _homeScreenState.value = _homeScreenState.value.copy(
-            productListCategory = "1", productListSubCategory = "15"
-        )
-        return repository.getAllProductsLocal()
-    }
-
     fun getAllCategories() {
         viewModelScope.launch {
             val categories = repository.getAllCategories(myPreference.getStoredTag())
-//            val category = Category(
-//                id = 0,
-//                name = "All Categories",
-//                product = emptyList(),
-//                status = "Active",
-//                subCategory = emptyList()
-//            )
             val finalList = mutableListOf<Category>()
-//            finalList.add(category)
             categories.data?.let { finalList.addAll(it.categories) }
             categories.data?.categories = finalList
             _homeScreenState.value = _homeScreenState.value.copy(
@@ -108,16 +85,7 @@ class HomeViewModel @Inject constructor(
     fun getAllSubCategories() {
         viewModelScope.launch {
             val subcategories = repository.getAllSubCategories(myPreference.getStoredTag())
-//            val subcategory = SubCategory(
-//                id = 0,
-//                name = "All Categories",
-//                status = "Active",
-//                categoryId = 0,
-//                url = ""
-//
-//            )
             val finalList = mutableListOf<SubCategory>()
-//            finalList.add(subcategory)
             subcategories.data?.let { finalList.addAll(it.categories) }
             subcategories.data?.categories = finalList
             _homeScreenState.value =
@@ -126,6 +94,18 @@ class HomeViewModel @Inject constructor(
                 })
             _homeScreenState.value=_homeScreenState.value.copy(productListSubCategory = _homeScreenState.value.subCategories[0].id.toString())
             getProducts()
+        }
+    }
+
+    fun updateSubCatList(productListCategory: String){
+        viewModelScope.launch {
+            val subcategories = repository.getAllSubCategories(myPreference.getStoredTag())
+
+            _homeScreenState.value =
+                _homeScreenState.value.copy(subCategories = subcategories.data?.categories?.filter { subCategory ->
+                    subCategory.categoryId == productListCategory.toInt()
+                } ?: emptyList())
+
         }
     }
 }

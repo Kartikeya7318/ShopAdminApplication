@@ -2,7 +2,7 @@ package com.devs.adminapplication.models.addProduct
 
 data class ProductInfo(
     var color: String="",
-    var price: String="",
+    var price: Int=0,
     var size: String="",
-    var quantity: String=""
+    var quantity: Int=0
 )
