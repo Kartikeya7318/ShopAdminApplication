@@ -13,6 +13,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
 import retrofit2.Response
+import retrofit2.Retrofit
 import retrofit2.http.*
 
 interface AdminShopApi {
@@ -51,7 +52,7 @@ interface AdminShopApi {
         @Header("Authorization") token: String,
         @Part file: MultipartBody.Part,
         @Part("req") requestBody: RequestBody
-    )
+    ):Response<Retrofit>
 
 
 }

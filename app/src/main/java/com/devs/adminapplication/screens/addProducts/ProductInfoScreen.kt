@@ -1,30 +1,46 @@
 package com.devs.adminapplication.screens.addProducts
 
+import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.text.isDigitsOnly
+import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.devs.adminapplication.models.addProduct.ProductInfo
+import com.devs.adminapplication.navigation.AdminScreens
 import com.devs.adminapplication.screens.componenents.TextBox
 import com.devs.adminapplication.ui.theme.BorderColor
+import com.devs.adminapplication.ui.theme.PrimaryDark
 import com.devs.adminapplication.ui.theme.PrimaryLight
 
+
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun ProductInfoScreen(
     navController: NavController,
@@ -32,6 +48,9 @@ fun ProductInfoScreen(
 ) {
     val product: ProductInfo = ProductInfo()
     var productInfo :MutableList<ProductInfo> = emptyList<ProductInfo>().toMutableList()
+    val loading = addProductViewModel.loading.collectAsState();
+    val failReason = addProductViewModel.failReason.collectAsState()
+    val context = LocalContext.current
     Column() {
 
 
@@ -51,6 +70,11 @@ fun ProductInfoScreen(
                 Spacer(modifier = Modifier.size(10.dp))
             }
         }
+        if (loading.value == true)
+            CircularProgressIndicator(color = PrimaryDark)
+        if (failReason.value != " ") {
+            Toast.makeText(context, addProductViewModel.failReason.value, Toast.LENGTH_SHORT).show()
+        }
         Button(
             modifier = Modifier
                 .fillMaxWidth()
@@ -68,7 +92,12 @@ fun ProductInfoScreen(
 
                 Log.d("LoginFlow", "ProductInfo: "+productInfo.toString())
 //                addProductViewModel.setProductDetails(productInfo)
-                addProductViewModel.addProductToServer(productInfo)
+                addProductViewModel.addProductToServer(productInfo){
+                    Toast.makeText(context,"Product Upload Success",Toast.LENGTH_SHORT).show()
+                    navController.popBackStack()
+                    navController.navigate(AdminScreens.HomeScreen.name)
+                }
+
             },
             enabled = true,
             colors = ButtonDefaults.buttonColors(
@@ -101,7 +130,9 @@ fun TypeBox(i: Int, productInfo: MutableList<ProductInfo>, ) {
         var price = remember { mutableStateOf("") }
         TextBox(name = price, label = "Price", focusManager = LocalFocusManager.current)
         var size = remember { mutableStateOf("") }
-        TextBox(name = size, label = "Size", focusManager = LocalFocusManager.current)
+//        TextBox(name = size, label = "Size", focusManager = LocalFocusManager.current)
+        val expanded1 = remember { mutableStateOf(false) }
+        TextBoxSelectable(name = size, label = "Size", focusManager =LocalFocusManager.current , expanded =expanded1 )
         var quantity = remember { mutableStateOf("") }
         TextBox(name = quantity, label = "Quantity", focusManager = LocalFocusManager.current)
         product.color=color.value
@@ -117,6 +148,73 @@ fun TypeBox(i: Int, productInfo: MutableList<ProductInfo>, ) {
         }
         productInfo[i] = product
     }
+}
+@Composable
+fun TextBoxSelectable(
+    name: MutableState<String>,
+    label: String,
+    focusManager: FocusManager,
+    expanded: MutableState<Boolean>,
+    enabled: Boolean = true,
+    onValueChange: (id: String) -> Unit = { }
+) {
+    val icon = if (expanded.value)
+        Icons.Filled.KeyboardArrowUp
+    else
+        Icons.Filled.KeyboardArrowDown
+    var textfieldSize by remember {
+        mutableStateOf(androidx.compose.ui.geometry.Size.Zero)
+    }
+//    val suggestions = listOf("Kotlin", "Java", "Dart", "Python")
+    Column() {
+        OutlinedTextField(
+            value = name.value,
+            onValueChange = { },
+            label = { androidx.compose.material.Text(text = label) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .onGloballyPositioned { coordinates ->
+                    //This value is used to assign to the DropDown the same width
+                    textfieldSize = coordinates.size.toSize()
+                },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(onNext = {
+                focusManager.moveFocus(FocusDirection.Down)
+            }),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = Color(0xFF00BCD4),
+                cursorColor = Color(0xFF00BCD4),
+                focusedLabelColor = Color(0xFF00ACC1)
+            ),
+            trailingIcon = {
+                Icon(icon, "contentDescription",
+                    Modifier.clickable { expanded.value = !expanded.value })
+            },
+            enabled = enabled
+        )
+        DropdownMenu(
+            expanded = expanded.value,
+            onDismissRequest = { expanded.value = false },
+            modifier = Modifier
+                .width(with(LocalDensity.current) { textfieldSize.width.toDp() })
+        ) {
+            val suggestions= listOf<String>("S","M","L","XL","XXL")
+            suggestions.forEach { label ->
+                DropdownMenuItem(onClick = {
+                    name.value = label
+                    expanded.value = false
+                    onValueChange(label)
+                }) {
+                    androidx.compose.material.Text(text = label)
+                }
+            }
+        }
+    }
+
 }
 
 

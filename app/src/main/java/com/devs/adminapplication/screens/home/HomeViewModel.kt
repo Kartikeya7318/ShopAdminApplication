@@ -1,15 +1,10 @@
 package com.devs.adminapplication.screens.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.devs.adminapplication.models.util.DataOrException
-import com.devs.adminapplication.models.productResponse.Products
 import com.devs.adminapplication.models.categories.Category
-import com.devs.adminapplication.models.categories.CategoryList
 import com.devs.adminapplication.models.productResponse.Product
 import com.devs.adminapplication.models.subcategories.SubCategory
-import com.devs.adminapplication.models.subcategories.SubCategoryList
 import com.devs.adminapplication.repository.ProductsRepository
 import com.devs.adminapplication.utils.MyPreference
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +12,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.Exception
 
 data class HomeScreenState(
 
@@ -40,7 +34,7 @@ class HomeViewModel @Inject constructor(
     init {
         getAllCategories()
         getAllSubCategories()
-        getProducts()
+//        getProducts()
     }
 
     fun updateProductListCategory(productListCategory: String){
@@ -53,6 +47,7 @@ class HomeViewModel @Inject constructor(
         productListCategory: String = _homeScreenState.value.productListCategory,
         productListSubCategory: String = _homeScreenState.value.productListSubCategory
     ) {
+
         viewModelScope.launch {
             val res = repository.getProducts(
                 token = myPreference.getStoredTag(), subCategoryId = productListSubCategory

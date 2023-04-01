@@ -86,7 +86,8 @@ fun HomeScreen(navController: NavController, homeViewModel: HomeViewModel = hilt
             categoriesList = subCatList
         ) {
             scope.launch {
-                homeViewModel.getProducts(productListSubCategory = it)
+                    homeViewModel.getProducts(productListSubCategory = it)
+
             }
 
         }

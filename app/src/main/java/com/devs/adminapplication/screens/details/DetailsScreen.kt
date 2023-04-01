@@ -4,9 +4,7 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
@@ -24,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.devs.adminapplication.models.productResponse.ProductDetail
 import com.devs.adminapplication.models.util.ChipList
@@ -232,7 +229,7 @@ fun DetailsScreen(
 @Composable
 private fun Table(productDetails: List<ProductDetail>, saveEnabled: Boolean) {
     val colors = mutableListOf<String>()
-    val sizes = listOf<String>("S", "M", "L", "XL", "L")
+    val sizes = listOf<String>("S", "M", "L", "XL", "XXL")
     for (it in productDetails.indices) {
         val color = productDetails[it].color
 //        val size = productDetails[it].size

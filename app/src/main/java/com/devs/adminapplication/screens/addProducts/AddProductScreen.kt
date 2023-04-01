@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
-import android.provider.ContactsContract.Contacts.AggregationSuggestions
 import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -47,13 +46,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
-import coil.request.ImageRequest
 import com.devs.adminapplication.R
 import com.devs.adminapplication.models.util.ChipList
 import com.devs.adminapplication.navigation.AdminScreens
-
 import com.devs.adminapplication.screens.componenents.TextBox
 import com.devs.adminapplication.screens.componenents.isInteger
 import com.devs.adminapplication.screens.home.HomeViewModel
@@ -190,7 +185,7 @@ fun AddProductScreen(
                 Log.d("LoginFlow", "AddProductScreen: " + nProducts.value)
                 if (isInteger(nProducts.value))
                     addProductViewModel.setProduct(
-                        name = name.value,
+                        name = name.value.replace(" ","_"),
                         subCategoryId = subCategoryId.value,
                         brandId = brandId.value,
                         price = price.value,
