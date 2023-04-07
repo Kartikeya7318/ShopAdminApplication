@@ -15,7 +15,9 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -35,6 +37,7 @@ import androidx.navigation.NavController
 import com.devs.adminapplication.models.addProduct.ProductInfo
 import com.devs.adminapplication.navigation.AdminScreens
 import com.devs.adminapplication.screens.componenents.TextBox
+import com.devs.adminapplication.screens.componenents.TextBoxSelectable
 import com.devs.adminapplication.ui.theme.BorderColor
 import com.devs.adminapplication.ui.theme.PrimaryDark
 import com.devs.adminapplication.ui.theme.PrimaryLight
@@ -132,7 +135,7 @@ fun TypeBox(i: Int, productInfo: MutableList<ProductInfo>, ) {
         var size = remember { mutableStateOf("") }
 //        TextBox(name = size, label = "Size", focusManager = LocalFocusManager.current)
         val expanded1 = remember { mutableStateOf(false) }
-        TextBoxSelectable(name = size, label = "Size", focusManager =LocalFocusManager.current , expanded =expanded1 )
+        TextBoxSelectableSizes(name = size, label = "Size", focusManager =LocalFocusManager.current , expanded =expanded1)
         var quantity = remember { mutableStateOf("") }
         TextBox(name = quantity, label = "Quantity", focusManager = LocalFocusManager.current)
         product.color=color.value
@@ -149,13 +152,15 @@ fun TypeBox(i: Int, productInfo: MutableList<ProductInfo>, ) {
         productInfo[i] = product
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TextBoxSelectable(
+fun TextBoxSelectableSizes(
     name: MutableState<String>,
     label: String,
     focusManager: FocusManager,
     expanded: MutableState<Boolean>,
     enabled: Boolean = true,
+    isError: MutableState<Boolean> = mutableStateOf(false),
     onValueChange: (id: String) -> Unit = { }
 ) {
     val icon = if (expanded.value)
@@ -167,10 +172,10 @@ fun TextBoxSelectable(
     }
 //    val suggestions = listOf("Kotlin", "Java", "Dart", "Python")
     Column() {
-        OutlinedTextField(
+        androidx.compose.material3.OutlinedTextField(
             value = name.value,
             onValueChange = { },
-            label = { androidx.compose.material.Text(text = label) },
+            label = { Text(text = label) },
             modifier = Modifier
                 .fillMaxWidth()
                 .onGloballyPositioned { coordinates ->
@@ -183,6 +188,7 @@ fun TextBoxSelectable(
                 imeAction = ImeAction.Next
             ),
             keyboardActions = KeyboardActions(onNext = {
+                // TODO you're action goes here
                 focusManager.moveFocus(FocusDirection.Down)
             }),
             colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -194,7 +200,12 @@ fun TextBoxSelectable(
                 Icon(icon, "contentDescription",
                     Modifier.clickable { expanded.value = !expanded.value })
             },
-            enabled = enabled
+            enabled = enabled,
+            isError = isError.value,
+            supportingText = {
+                if (isError.value)
+                    Text(text = "*Required")
+            }
         )
         DropdownMenu(
             expanded = expanded.value,
@@ -209,7 +220,7 @@ fun TextBoxSelectable(
                     expanded.value = false
                     onValueChange(label)
                 }) {
-                    androidx.compose.material.Text(text = label)
+                    androidx.compose.material3.Text(text = label)
                 }
             }
         }

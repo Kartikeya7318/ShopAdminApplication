@@ -26,10 +26,9 @@ import coil.request.ImageRequest
 import com.devs.adminapplication.models.productResponse.ProductDetail
 import com.devs.adminapplication.models.util.ChipList
 import com.devs.adminapplication.navigation.AdminScreens
-import com.devs.adminapplication.screens.addProducts.TextBoxSelectable
+import com.devs.adminapplication.screens.componenents.TextBoxSelectable
 import com.devs.adminapplication.screens.componenents.TextBox
 import com.devs.adminapplication.screens.home.HomeViewModel
-import com.devs.adminapplication.ui.theme.BorderColor
 import com.devs.adminapplication.ui.theme.PrimaryLight
 import com.devs.adminapplication.ui.theme.PrimaryText
 import com.devs.adminapplication.utils.Constants
@@ -324,48 +323,6 @@ fun cell(text: String = "0", height: Dp = 30.dp, width: Dp = 40.dp, saveEnabled:
     }
 }
 
-
-@Composable
-fun DetailBox(it: Int, productInfo: MutableList<ProductDetail>, enabled: Boolean) {
-    Column(
-        modifier = Modifier
-            .border(width = 1.dp, shape = RoundedCornerShape(5.dp), color = BorderColor)
-            .padding(
-                start = 15.dp, top = 10.dp,
-                end = 15.dp, bottom = 10.dp
-            )
-    ) {
-        var id = remember { mutableStateOf(productInfo[it].id.toString()) }
-        TextBox(name = id, label = "Id", focusManager = LocalFocusManager.current, enabled)
-        var color = remember { mutableStateOf(productInfo[it].color) }
-        TextBox(name = color, label = "Color", focusManager = LocalFocusManager.current, enabled)
-        var price = remember { mutableStateOf(productInfo[it].price.toString()) }
-        TextBox(name = price, label = "Price", focusManager = LocalFocusManager.current, enabled)
-        var size = remember { mutableStateOf(productInfo[it].size) }
-        TextBox(name = size, label = "Size", focusManager = LocalFocusManager.current, enabled)
-        var quantity = remember { mutableStateOf(productInfo[it].quantity.toString()) }
-        TextBox(
-            name = quantity,
-            label = "Quantity",
-            focusManager = LocalFocusManager.current,
-            enabled
-        )
-        var remaining = remember { mutableStateOf(productInfo[it].remaningQuantaty.toString()) }
-        TextBox(
-            name = remaining,
-            label = "Remaining Quantity",
-            focusManager = LocalFocusManager.current,
-            enabled
-        )
-        productInfo[it].color = color.value
-        productInfo[it].price = price.value.toDouble()
-        productInfo[it].size = size.value
-        productInfo[it].id = id.value.toInt()
-        productInfo[it].quantity = quantity.value.toInt()
-        productInfo[it].remaningQuantaty = quantity.value.toInt()
-
-    }
-}
 
 
 @Composable
