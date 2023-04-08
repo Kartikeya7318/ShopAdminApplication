@@ -4,7 +4,7 @@ import com.devs.adminapplication.models.subcategories.SubCategory
 
 data class Product(
 
-    val id: Int,
+    var id: Int,
     val productName: String,
     val subCategory: SubCategory,
     val brand: Brand,

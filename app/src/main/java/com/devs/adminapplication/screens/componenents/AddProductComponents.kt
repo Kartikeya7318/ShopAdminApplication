@@ -35,13 +35,15 @@ fun TextBox(
     name: MutableState<String>,
     label: String,
     focusManager: FocusManager,
-    enabled:Boolean=true,
+    enabled: Boolean = true,
     isError: MutableState<Boolean> = mutableStateOf(false)
-    ) {
+) {
     OutlinedTextField(
         value = name.value,
-        onValueChange = {name.value=it
-                        isError.value=false },
+        onValueChange = {
+            name.value = it
+            isError.value = false
+        },
         label = { Text(text = label) },
         modifier = Modifier
             .fillMaxWidth(),
@@ -59,7 +61,7 @@ fun TextBox(
             cursorColor = Color(0xFF00BCD4),
             focusedLabelColor = Color(0xFF00ACC1),
 
-        ),
+            ),
         enabled = enabled,
         isError = isError.value,
         supportingText = {
@@ -126,8 +128,8 @@ fun TextBoxSelectable(
             ),
             trailingIcon = {
                 if (enabled)
-                Icon(icon, "contentDescription",
-                    Modifier.clickable { expanded.value = !expanded.value })
+                    Icon(icon, "contentDescription",
+                        Modifier.clickable { expanded.value = !expanded.value })
             },
             enabled = enabled,
             isError = isError.value,
@@ -149,7 +151,7 @@ fun TextBoxSelectable(
                     onValueChange(label.id)
                 }) {
                     Text(text = label.name)
-                    isError.value=false
+                    isError.value = false
                 }
             }
         }

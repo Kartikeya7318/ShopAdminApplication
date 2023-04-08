@@ -8,6 +8,7 @@ import com.devs.adminapplication.models.login.LoginRequest
 import com.devs.adminapplication.models.login.LoginResponse
 import com.devs.adminapplication.models.productResponse.Products
 import com.devs.adminapplication.models.subcategories.SubCategoryList
+import com.devs.adminapplication.models.updateProduct.ProductUpdate
 import com.devs.adminapplication.utils.Constants
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -54,5 +55,12 @@ interface AdminShopApi {
         @Part("req") requestBody: RequestBody
     ):Response<Retrofit>
 
+    @PUT("product/{id}")
+    @Multipart
+    suspend fun updateProduct(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Part("req") product: RequestBody
+    ): Response<Retrofit>
 
 }

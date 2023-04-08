@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.devs.adminapplication.screens.MainActivityScreen
 import com.devs.adminapplication.screens.addProducts.AddProductViewModel
+import com.devs.adminapplication.screens.details.DetailScreenViewModel
 import com.devs.adminapplication.screens.details.DetailsScreen
 import com.devs.adminapplication.screens.home.HomeViewModel
 
@@ -29,9 +30,10 @@ fun RootNavigationGraph(navController1: NavHostController) {
                 navArgument(name = "subId"){type= NavType.StringType}
             )
         ) { backStackEntry ->
-            val homeViewModel = hiltViewModel<HomeViewModel>()
+            val detailScreenViewModel = hiltViewModel<DetailScreenViewModel>()
+            detailScreenViewModel.getProduct(backStackEntry.arguments?.getString("id")!!,backStackEntry.arguments?.getString("subId")!!)
             DetailsScreen(navController = navController1,
-                backStackEntry.arguments?.getString("id")!!,backStackEntry.arguments?.getString("subId")!!,homeViewModel)
+                backStackEntry.arguments?.getString("id")!!,backStackEntry.arguments?.getString("subId")!!,detailScreenViewModel)
         }
 
 
