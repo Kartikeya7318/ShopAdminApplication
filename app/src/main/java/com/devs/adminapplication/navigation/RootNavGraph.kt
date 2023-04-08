@@ -31,7 +31,7 @@ fun RootNavigationGraph(navController1: NavHostController) {
             )
         ) { backStackEntry ->
             val detailScreenViewModel = hiltViewModel<DetailScreenViewModel>()
-            detailScreenViewModel.getProduct(backStackEntry.arguments?.getString("id")!!,backStackEntry.arguments?.getString("subId")!!)
+            detailScreenViewModel.getProduct(backStackEntry.arguments?.getString("id")!!)
             DetailsScreen(navController = navController1,
                 backStackEntry.arguments?.getString("id")!!,backStackEntry.arguments?.getString("subId")!!,detailScreenViewModel)
         }

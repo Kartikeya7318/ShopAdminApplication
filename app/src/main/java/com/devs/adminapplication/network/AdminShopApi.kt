@@ -26,21 +26,37 @@ interface AdminShopApi {
         @Header("Authorization") token: String
     ): Products
 
-    @GET(Constants.CATEGORY_URL)
+    @GET("category/")
     suspend fun getAllCategories(
-        @Header("Authorization") token: String
+        @Header("Authorization") token: String,
+        @Query("status") status:String ="ALL"
     ): CategoryList
 
-    @GET(Constants.SUB_CATEGORY_URL)
+
+    @GET("sub_category/1")
     suspend fun getAllSubCategories(
         @Header("Authorization") token: String
+    ): SubCategoryList
+    @GET("sub_category")
+    suspend fun getAllSubCategoriesDeleted(
+        @Header("Authorization") token: String,
+        @Query("status") status:String ="DELETE",
     ): SubCategoryList
 
     @GET(Constants.SUB_PRODUCT_URL)
     suspend fun getProducts(
         @Header("Authorization") token: String,
-        @Query("subCategoryId") subCategoryId : Long, @Query("brandId") brandId: Long
+        @Query("subCategoryId") subCategoryId : Long,
+        @Query("brandId") brandId: Long,
+        @Query("status") status:String ="ACTIVE",
     ): Products
+
+    @GET("product/{id}")
+    suspend fun getProduct(
+        @Header("Authorization") token: String,
+        @Path("id") productId: Int,
+    ): Products
+
 
     @POST(Constants.ADD_PRODUCT_URL)
     suspend fun addProductToServer(@Body product : ProductAdd,@Part image: MultipartBody.Part): AddProductResponse

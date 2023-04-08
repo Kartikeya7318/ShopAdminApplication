@@ -19,6 +19,15 @@ class ProductsRepository @Inject constructor(private val api: AdminShopApi,priva
         }
         return DataOrException(data = response)
     }
+    suspend fun getProduct(token: String,productId:String): DataOrException<Products, Boolean, Exception>{
+        val response=try {
+            Log.d("LoginFlow", "getAllProducts: "+token)
+            api.getProduct(token=token,productId=productId.toInt())
+        } catch (e:Exception){
+            return DataOrException(e=e)
+        }
+        return DataOrException(data = response)
+    }
     suspend fun getAllProducts(token:String): DataOrException<Products, Boolean, Exception> {
         val response=try {
             Log.d("LoginFlow", "getAllProducts: "+token)
@@ -43,7 +52,7 @@ class ProductsRepository @Inject constructor(private val api: AdminShopApi,priva
     suspend fun getAllSubCategories(token: String): DataOrException<SubCategoryList, Boolean, Exception> {
         val response=try {
             Log.d("LoginFlow", "getAllCategories: "+token)
-            api.getAllSubCategories(token=token)
+            api.getAllSubCategoriesDeleted(token=token)
         } catch (e:Exception){
             return DataOrException(e=e)
         }

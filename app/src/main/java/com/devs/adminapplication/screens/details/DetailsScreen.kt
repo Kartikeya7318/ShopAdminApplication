@@ -40,6 +40,7 @@ data class inputDialogState(
     val size: String = "",
     val color: String = "",
     val data: String = "",
+    val data2: String = "",
     val label: String = "",
     val index: Int = 0
 )
@@ -74,7 +75,7 @@ fun DetailsScreen(
     for (i in 0 until (detailScreenState.categories.size)) {
         val chipList = ChipList(
             id = detailScreenState.categories[i].id.toString(),
-            name = detailScreenState.categories[i].name.toString()
+            name = detailScreenState.categories[i].name
         )
         catList.add(chipList)
         Constants.CATEGORIES = catList
@@ -84,7 +85,7 @@ fun DetailsScreen(
     for (i in 0 until (detailScreenState.subCategories.size)) {
         val chipList = ChipList(
             id = detailScreenState.subCategories[i].id.toString(),
-            name = detailScreenState.subCategories[i].name.toString()
+            name = detailScreenState.subCategories[i].name
         )
         subCatList.add(chipList)
         Log.d("reload flow", "DetailsScreen: list  " + subCatList.toString())
@@ -257,14 +258,15 @@ fun DetailsScreen(
                 InputDialogView(
                     openDialog = openInputDialog,
                     data = inputDialogState.value.data,
+                    data2 = inputDialogState.value.data2,
                     label = inputDialogState.value.label,
                     size = inputDialogState.value.size,
                     color = inputDialogState.value.color
-                ) {
+                ) { it, id ->
                     if (inputDialogState.value.index == productInfo.size)
                         productInfo.add(
                             ProductDetail(
-                                id = 0,
+                                id = -1,
                                 status = true,
                                 color = inputDialogState.value.color,
                                 size = inputDialogState.value.size,
@@ -278,6 +280,8 @@ fun DetailsScreen(
                         productInfo[inputDialogState.value.index].price = it.toDouble()
                     else
                         productInfo[inputDialogState.value.index].remaningQuantaty = it.toInt()
+                    if (inputDialogState.value.data2 == "0.0")
+                        productInfo[inputDialogState.value.index].price = id.toDouble()
                     Log.d("Update result", "DetailsScreen: " + productInfo)
                     toggle.value = !toggle.value
                     openInputDialog.value = false
@@ -310,38 +314,37 @@ fun DetailsScreen(
                                         brandId = brandId,
                                         price = priceRange.value,
                                     )
-                                    update = update.copy(
-                                        productInfo = listOf(
-                                            ProductUpdateInfoWithKey(
-                                                id = product.id,
-                                                color = productInfo[0].color,
-                                                price = productInfo[0].price,
-                                                size = productInfo[0].size,
-                                                quantity = productInfo[0].remaningQuantaty
+
+                                    for (i in 0 until productInfo.size) {
+                                        if (productInfo[i].id == -1) {
+                                            update = update.copy(
+                                                productInfo = update.productInfo +
+                                                        ProductUpdateInfo(
+                                                            color = productInfo[i].color,
+                                                            price = productInfo[i].price,
+                                                            size = productInfo[i].size,
+                                                            quantity = productInfo[i].remaningQuantaty
+                                                        )
                                             )
-                                        )
-                                    )
-                                    for (i in 1 until productInfo.size) {
-                                        update = update.copy(
-                                            productInfo = update.productInfo + (listOf(
-                                                ProductUpdateInfo(
-                                                    color = productInfo[i].color,
-                                                    price = productInfo[i].price,
-                                                    size = productInfo[i].size,
-                                                    quantity = productInfo[i].remaningQuantaty
-                                                )
-                                            ))
-                                        )
+                                        } else {
+                                            update = update.copy(
+                                                productInfo = update.productInfo +
+                                                        ProductUpdateInfoWithKey(
+                                                            id = productInfo[i].id,
+                                                            color = productInfo[i].color,
+                                                            price = productInfo[i].price,
+                                                            size = productInfo[i].size,
+                                                            quantity = productInfo[i].remaningQuantaty
+                                                        )
+                                            )
+                                        }
 
                                     }
-//                                    detailScreenViewModel.updateProductOnServer(update, product.id)
-//                                    Log.d("Update result", "DetailsScreen: " +update)
-//                                    val requestBody = Gson().toJson(update).toRequestBody("application/json".toMediaTypeOrNull())
+                                    detailScreenViewModel.updateProductOnServer(update, product.id)
                                     Log.d(
                                         "Update result",
                                         "DetailsScreen: JSON " + Gson().toJson(update)
                                     )
-
 
                                 }) {
                                 Text("Yes")
@@ -436,6 +439,7 @@ private fun TableQuantity(
                                             size = l.value[0].size,
                                             label = "Quantity",
                                             data = l.value[0].remaningQuantaty.toString(),
+                                            data2 = l.value[0].price.toString(),
                                             index = index
                                         )
                                     openInputDialog.value = true
@@ -448,6 +452,7 @@ private fun TableQuantity(
                                             size = size,
                                             label = "Quantity",
                                             data = "0",
+                                            data2="0.0",
                                             index = productInfo.size
                                         )
                                     openInputDialog.value = true
@@ -533,20 +538,22 @@ private fun TablePrice(
                                             size = l.value[0].size,
                                             label = "Price",
                                             data = l.value[0].price.toString(),
+                                            data2 = l.value[0].remaningQuantaty.toString(),
                                             index = index
                                         )
                                     openInputDialog.value = true
-//                                                openDialog=true
+
 
                                 }
                             } else {
-                                cell("0.0",saveEnabled = saveEnabled) {
+                                cell("0.0", saveEnabled = saveEnabled) {
                                     inputDialogState.value =
                                         inputDialogState.value.copy(
                                             color = color,
                                             size = size,
                                             label = "Price",
                                             data = "0.0",
+                                            data2="0",
                                             index = productInfo.size
                                         )
                                     openInputDialog.value = true
@@ -584,8 +591,8 @@ fun cell(
             )
             .clickable {
                 Log.d("Update result", "cell: " + text)
-                if(saveEnabled)
-                onClick()
+                if (saveEnabled)
+                    onClick()
             },
 
         contentAlignment = Alignment.Center
@@ -689,33 +696,48 @@ fun DetailBar(
 fun InputDialogView(
     openDialog: MutableState<Boolean> = mutableStateOf(false),
     data: String,
+    data2: String,
     label: String,
     size: String,
     color: String,
-    onDismiss: (String) -> Unit
+    onDismiss: (String, String) -> Unit
 ) {
 
     if (openDialog.value) {
         var datastate by remember {
             mutableStateOf(data)
         }
-
+        var datastate2 by remember {
+            mutableStateOf("0.0")
+        }
         AlertDialog(
             onDismissRequest = {
                 openDialog.value = false
             },
             title = {
-                Text(text = "Input $label for size : $size and color : $color")
+                Text(text = "Input data for size : $size and color : $color")
             },
             text = {
-                OutlinedTextField(
-                    value = datastate,
-                    onValueChange = { datastate = it },
-                    label = { Text(text = label) }
-                )
+                Column() {
+
+                    OutlinedTextField(
+                        value = datastate,
+                        onValueChange = { datastate = it },
+                        label = { Text(text = label) }
+                    )
+
+                    if (label == "Quantity" && data2 == "0.0") {
+                        Spacer(modifier = Modifier.size(10.dp))
+                        OutlinedTextField(
+                            value = datastate2,
+                            onValueChange = { datastate2 = it },
+                            label = { Text(text = "Price") }
+                        )
+                    }
+                }
             },
             confirmButton = {
-                Button(onClick = { onDismiss(datastate); }) {
+                Button(onClick = { onDismiss(datastate, datastate2); }) {
                     Text(text = "OK")
                 }
             },

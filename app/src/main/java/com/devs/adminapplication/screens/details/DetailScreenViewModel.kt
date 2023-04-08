@@ -41,13 +41,11 @@ class DetailScreenViewModel @Inject constructor(
                 } ?: emptyList())
         }
     }
-    fun getProduct(productId:String,productListSubCategory: String){
+    fun getProduct(productId:String){
         viewModelScope.launch {
-            val res= repository.getProducts(
-                token = myPreference.getStoredTag(), subCategoryId = productListSubCategory
-            ).data?.products?.filter { product ->
-                product.id == productId.toInt()
-            }
+            val res= repository.getProduct(
+                token = myPreference.getStoredTag(), productId = productId
+            ).data?.products
             _detailScreenState.value=_detailScreenState.value.copy(
                 product = res?.get(0)
             )

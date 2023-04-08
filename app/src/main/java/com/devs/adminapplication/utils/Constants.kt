@@ -11,8 +11,8 @@ object Constants {
     const val POSTS_URL = "posts"
     const val USER_TOKEN = "user_token"
     const val USER_DATA = "user_data"
-    const val CATEGORY_URL="category/"
-    const val SUB_CATEGORY_URL="sub_category/"
+    const val CATEGORY_URL="category/1"
+    const val SUB_CATEGORY_URL="sub_category/1"
 
     var CATEGORIES:MutableList<ChipList> = mutableListOf()
     var SUBCATEGORIES:MutableList<ChipList> = mutableListOf()

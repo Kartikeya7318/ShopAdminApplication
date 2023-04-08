@@ -10,5 +10,4 @@ data class ProductDetail(
     var price: Double,
     var remaningQuantaty: Int,
 
-
     )

@@ -79,6 +79,7 @@ class HomeViewModel @Inject constructor(
 
     fun getAllSubCategories() {
         viewModelScope.launch {
+
             val subcategories = repository.getAllSubCategories(myPreference.getStoredTag())
             val finalList = mutableListOf<SubCategory>()
             subcategories.data?.let { finalList.addAll(it.categories) }
