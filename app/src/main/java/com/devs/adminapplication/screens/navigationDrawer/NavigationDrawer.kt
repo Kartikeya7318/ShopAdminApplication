@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.runtime.*
@@ -157,10 +158,19 @@ fun Menu(
     navController: NavController,
     contains: @Composable () -> Unit
 ) {
+    var selectedScreen by remember {
+        mutableStateOf(AdminScreens.HomeScreen.name)
+    }
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
-            AppBar {
+            AppBar(refreshState = {
+                navController.popBackStack()
+                navController.navigate(selectedScreen){
+//                    launchSingleTop=true
+//                    restoreState=true
+                }
+            }) {
                 scope.launch {
                     scaffoldState.drawerState.open()
                 }
@@ -236,6 +246,7 @@ fun Menu(
                     ),
                 )
             ) {
+                selectedScreen=it.route
                 println("Clicked on ${it.title}")
                 navController.popBackStack()
                 navController.navigate(it.route){
@@ -254,7 +265,7 @@ fun Menu(
 }
 
 @Composable
-fun AppBar(onMenuClick: () -> Unit) {
+fun AppBar(refreshState: ()-> Unit,onMenuClick: () -> Unit) {
     TopAppBar(
         backgroundColor = PrimaryLight,
         elevation = 0.dp,
@@ -283,12 +294,14 @@ fun AppBar(onMenuClick: () -> Unit) {
                 fontSize = 20.sp,
                 color = PrimaryText,
             )
-            Icon(
-                imageVector = Icons.Rounded.Notifications,
-                contentDescription = "Notification",
-                modifier = Modifier.size(28.dp),
-                tint = Color.Black
-            )
+            IconButton(onClick = refreshState) {
+                Icon(
+                    imageVector = Icons.Rounded.History,
+                    contentDescription = "Done",
+                    modifier = Modifier.size(28.dp),
+                    tint = Color.Black
+                )
+            }
         }
 
 

@@ -130,7 +130,6 @@ fun AddProductScreen(
                 )
             }
 
-
         }
         var error1 = remember { mutableStateOf(false) }
         var error2 = remember { mutableStateOf(false) }

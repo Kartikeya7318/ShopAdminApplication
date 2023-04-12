@@ -3,18 +3,17 @@ package com.devs.adminapplication.navigation
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import com.devs.adminapplication.screens.addBrands.AddBrandScreen
 import com.devs.adminapplication.screens.addCategories.AddCategoryScreen
+import com.devs.adminapplication.screens.addCategories.AddCategoryViewModel
 import com.devs.adminapplication.screens.addProducts.AddProductScreen
 import com.devs.adminapplication.screens.addProducts.AddProductViewModel
 
 import com.devs.adminapplication.screens.addProducts.ProductInfoScreen
 import com.devs.adminapplication.screens.addSubCategories.AddSubCategoryScreen
-import com.devs.adminapplication.screens.details.DetailsScreen
+import com.devs.adminapplication.screens.addSubCategories.SubCategoryViewModel
 import com.devs.adminapplication.screens.home.HomeScreen
 import com.devs.adminapplication.screens.home.HomeViewModel
 
@@ -28,7 +27,7 @@ fun HomeNavGraph(navController2: NavHostController, navControllerRoot: NavHostCo
         startDestination = AdminScreens.HomeScreen.name
     ) {
         composable(AdminScreens.HomeScreen.name) {
-
+            homeViewModel.getAllCategories()
             HomeScreen(navController = navControllerRoot, homeViewModel)
         }
         composable(AdminScreens.AddProductScreen.name) {
@@ -45,10 +44,14 @@ fun HomeNavGraph(navController2: NavHostController, navControllerRoot: NavHostCo
             AddBrandScreen()
         }
         composable(AdminScreens.AddCategoryScreen.name){
-            AddCategoryScreen()
+            val categoryViewModel= hiltViewModel<AddCategoryViewModel>()
+            categoryViewModel.getAllCategories()
+            AddCategoryScreen(categoryViewModel)
         }
         composable(AdminScreens.AddSubCategoryScreen.name){
-            AddSubCategoryScreen()
+            val subCategoryViewModel= hiltViewModel<SubCategoryViewModel>()
+            subCategoryViewModel.getAllCategories()
+            AddSubCategoryScreen(subCategoryViewModel)
         }
 
 

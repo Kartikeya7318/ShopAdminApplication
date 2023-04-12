@@ -27,7 +27,7 @@ import com.devs.adminapplication.utils.Constants
 import kotlinx.coroutines.launch
 
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "SuspiciousIndentation")
 @Composable
 fun HomeScreen(navController: NavController, homeViewModel: HomeViewModel = hiltViewModel()) {
 
@@ -52,7 +52,8 @@ fun HomeScreen(navController: NavController, homeViewModel: HomeViewModel = hilt
             id = homeScreenState.categories[i].id.toString(),
             name = homeScreenState.categories[i].name.toString()
         )
-        catList.add(chipList)
+        if (homeScreenState.categories[i].status == "Active")
+            catList.add(chipList)
         Constants.CATEGORIES = catList
     }
     val subCatList: MutableList<ChipList> = mutableListOf()
@@ -86,14 +87,14 @@ fun HomeScreen(navController: NavController, homeViewModel: HomeViewModel = hilt
             categoriesList = subCatList
         ) {
             scope.launch {
-                    homeViewModel.getProducts(productListSubCategory = it)
+                homeViewModel.getProducts(productListSubCategory = it)
 
             }
 
         }
 
-        itembox(homeScreenState.products){id->
-            navController.navigate(route = AdminScreens.DetailsScreen.name+ "/$id"+"/${homeScreenState.productListSubCategory}")
+        itembox(homeScreenState.products) { id ->
+            navController.navigate(route = AdminScreens.DetailsScreen.name + "/$id" + "/${homeScreenState.productListSubCategory}")
         }
 
     }
@@ -101,9 +102,9 @@ fun HomeScreen(navController: NavController, homeViewModel: HomeViewModel = hilt
 }
 
 @Composable
-private fun itembox(productList: List<Product>?,onClick: (String) -> Unit) {
+private fun itembox(productList: List<Product>?, onClick: (String) -> Unit) {
 
-    Column(modifier = Modifier.padding(start=10.dp,end = 10.dp)) {
+    Column(modifier = Modifier.padding(start = 10.dp, end = 10.dp)) {
 
 
         if (productList == null || productList.isEmpty()) {
@@ -118,7 +119,7 @@ private fun itembox(productList: List<Product>?,onClick: (String) -> Unit) {
 
                 itemsIndexed(newList!!) { index, item ->
 //            Text("Item at index $index is $item",Modifier.border(1.dp, Color.Blue).width(80.dp).wrapContentSize() )
-                    DataCard(newList.get(index)){ id->
+                    DataCard(newList.get(index)) { id ->
                         onClick(id)
                     }
                 }
@@ -132,7 +133,7 @@ private fun itembox(productList: List<Product>?,onClick: (String) -> Unit) {
 @Composable
 private fun DataCard(
     product: Product,
-    onClick: (String)-> Unit
+    onClick: (String) -> Unit
 ) {
     Card(
         modifier = Modifier

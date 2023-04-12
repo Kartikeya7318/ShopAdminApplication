@@ -79,4 +79,11 @@ interface AdminShopApi {
         @Part("req") product: RequestBody
     ): Response<Retrofit>
 
+    @POST("sub_category/")
+    @Multipart
+    suspend fun newSubCat(
+        @Header("Authorization") token: String,
+        @Part file: MultipartBody.Part,
+        @Part("req") requestBody: RequestBody
+    ):Response<Retrofit>
 }

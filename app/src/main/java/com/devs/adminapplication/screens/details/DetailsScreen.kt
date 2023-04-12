@@ -164,6 +164,18 @@ fun DetailsScreen(
                         ),
                         contentDescription = "Product Image"
                     )
+//                    Image(
+//                        painter = rememberAsyncImagePainter(
+//                            ImageRequest.Builder(LocalContext.current)
+//                                .data(data = "https://my-store-dev.s3.amazonaws.com/CT_1SUB_15.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20230412T073904Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=AKIASMP4WX6ADLGA6Y6G%2F20230412%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4c9990e33dd3fa229b42b097bf64998b024c93ed46819c714c31b78f6fc8a854")
+//                                .apply(block = fun ImageRequest.Builder.() {
+//                                    crossfade(true)
+//                                    transformations()
+//                                }).build()
+//                        ),
+//                        contentDescription = "Product Image"
+//                    )
+                       // https://my-store-dev.s3.amazonaws.com/CT_1SUB_15.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20230412T073904Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=AKIASMP4WX6ADLGA6Y6G%2F20230412%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4c9990e33dd3fa229b42b097bf64998b024c93ed46819c714c31b78f6fc8a854
                 }
 
 

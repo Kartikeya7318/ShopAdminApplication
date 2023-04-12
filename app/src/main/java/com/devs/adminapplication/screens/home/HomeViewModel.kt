@@ -33,7 +33,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         getAllCategories()
-        getAllSubCategories()
+//        getAllSubCategories()
 //        getProducts()
     }
 
@@ -74,6 +74,7 @@ class HomeViewModel @Inject constructor(
             _homeScreenState.value = _homeScreenState.value.copy(
                 categories = categories.data!!.categories
             )
+            getAllSubCategories()
         }
     }
 
