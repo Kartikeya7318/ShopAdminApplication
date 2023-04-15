@@ -1,9 +1,14 @@
 package com.devs.adminapplication.screens.details
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+//import androidx.compose.foundation.layout.BoxScopeInstance.align
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -11,8 +16,10 @@ import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontFamily
@@ -21,6 +28,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.devs.adminapplication.models.productResponse.ProductDetail
@@ -29,6 +37,7 @@ import com.devs.adminapplication.models.updateProduct.ProductUpdateInfo
 import com.devs.adminapplication.models.updateProduct.ProductUpdateInfoWithKey
 import com.devs.adminapplication.models.util.ChipList
 import com.devs.adminapplication.navigation.AdminScreens
+import com.devs.adminapplication.screens.addProducts.uriToFile
 import com.devs.adminapplication.screens.componenents.TextBoxSelectable
 import com.devs.adminapplication.screens.componenents.TextBox
 import com.devs.adminapplication.ui.theme.PrimaryLight
@@ -45,6 +54,7 @@ data class inputDialogState(
     val index: Int = 0
 )
 
+@OptIn(ExperimentalMaterialApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "MutableCollectionMutableState")
 @Composable
 fun DetailsScreen(
@@ -54,6 +64,7 @@ fun DetailsScreen(
     detailScreenViewModel: DetailScreenViewModel
 
 ) {
+    val context = LocalContext.current
     var subCategoryId = SubCategoryId
     var brandId = 0
     val detailScreenState by detailScreenViewModel.detailScreenState.collectAsState()
@@ -62,11 +73,15 @@ fun DetailsScreen(
     var saveEnabled by remember {
         mutableStateOf(false)
     }
+    var imageSaveEnabled by remember {
+        mutableStateOf(false)
+    }
 //    if (product!=null){
 //        detailScreenViewModel.getAllCategories()
 //        detailScreenViewModel.updateSubCatList(product.subCategory.categoryId.toString())
     var openDialog by remember { mutableStateOf(false) }
     var openInputDialog = remember { mutableStateOf(false) }
+    var openImageDialog = remember { mutableStateOf(false) }
     val inputDialogState = remember {
         mutableStateOf(inputDialogState())
     }
@@ -140,6 +155,13 @@ fun DetailsScreen(
             val expanded1 = remember { mutableStateOf(false) }
             val expanded2 = remember { mutableStateOf(false) }
             val expanded3 = remember { mutableStateOf(false) }
+            var selectedImageUri by remember {
+                mutableStateOf<Uri?>(null)
+            }
+            val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.PickVisualMedia(),
+                onResult = { uri -> selectedImageUri = uri }
+            )
             Column(
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())
@@ -151,31 +173,77 @@ fun DetailsScreen(
                         .fillMaxWidth()
                         .height(400.dp),
                     shape = RectangleShape,
+
                     elevation = 4.dp
                 ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            ImageRequest.Builder(LocalContext.current)
-                                .data(data = product.productImg[0].url)
-                                .apply(block = fun ImageRequest.Builder.() {
-                                    crossfade(true)
-                                    transformations()
-                                }).build()
-                        ),
-                        contentDescription = "Product Image"
-                    )
-//                    Image(
-//                        painter = rememberAsyncImagePainter(
-//                            ImageRequest.Builder(LocalContext.current)
-//                                .data(data = "https://my-store-dev.s3.amazonaws.com/CT_1SUB_15.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20230412T073904Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=AKIASMP4WX6ADLGA6Y6G%2F20230412%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4c9990e33dd3fa229b42b097bf64998b024c93ed46819c714c31b78f6fc8a854")
-//                                .apply(block = fun ImageRequest.Builder.() {
-//                                    crossfade(true)
-//                                    transformations()
-//                                }).build()
-//                        ),
-//                        contentDescription = "Product Image"
-//                    )
-                       // https://my-store-dev.s3.amazonaws.com/CT_1SUB_15.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20230412T073904Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=AKIASMP4WX6ADLGA6Y6G%2F20230412%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4c9990e33dd3fa229b42b097bf64998b024c93ed46819c714c31b78f6fc8a854
+                    Surface(
+                        color = Color.Black.copy(alpha = if (imageSaveEnabled) 0f else 0.1f),
+                        modifier = Modifier.fillMaxSize(),
+                        onClick = {
+                            if (imageSaveEnabled)
+                                singlePhotoPickerLauncher.launch(
+                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                )
+                        }
+                    ) {}
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            if (imageSaveEnabled) {
+                                IconButton(onClick = {
+                                    imageSaveEnabled = false
+                                    if (selectedImageUri!=null)
+                                    openImageDialog.value = true
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Done,
+                                        contentDescription = "Done",
+                                        modifier = Modifier.size(28.dp),
+                                        tint = Color.Black
+                                    )
+                                }
+                            } else {
+                                IconButton(onClick = { imageSaveEnabled = true }) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Edit,
+                                        contentDescription = "Edit",
+                                        modifier = Modifier.size(28.dp),
+                                        tint = Color.Black
+                                    )
+                                }
+                            }
+                        }
+                        if (selectedImageUri != null) {
+                            AsyncImage(
+                                model = selectedImageUri,
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxWidth(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Image(
+                                painter = rememberAsyncImagePainter(
+                                    ImageRequest.Builder(LocalContext.current)
+                                        .data(data = product.productImg[0].url)
+                                        .apply(block = fun ImageRequest.Builder.() {
+                                            crossfade(true)
+                                            transformations()
+                                        }).build()
+                                ),
+                                contentDescription = "Product Image"
+                            )
+                        }
+
+                    }
+
+
                 }
 
 
@@ -374,6 +442,44 @@ fun DetailsScreen(
                     )
                 }
 
+                if (openImageDialog.value) {
+
+                    AlertDialog(
+                        onDismissRequest = {
+
+                            openImageDialog.value = false
+                        },
+                        title = {
+                            Text(text = "Save Image Changes?")
+                        },
+                        text = {
+                            Text("Image of the product will be updated")
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    openImageDialog.value = false
+                                    imageSaveEnabled = false
+                                    val imgFile = uriToFile(context = context, selectedImageUri!!)
+                                    detailScreenViewModel.updateProductImg(id.value.toInt(),imgFile);
+//                                    detailScreenViewModel.updateProductOnServer(update, product.id)
+
+                                }) {
+                                Text("Yes")
+                            }
+                        },
+                        dismissButton = {
+                            Button(
+                                onClick = {
+                                    openImageDialog.value = false
+
+                                }) {
+                                Text("No")
+                            }
+                        }
+                    )
+                }
+
 
             }
         }
@@ -464,7 +570,7 @@ private fun TableQuantity(
                                             size = size,
                                             label = "Quantity",
                                             data = "0",
-                                            data2="0.0",
+                                            data2 = "0.0",
                                             index = productInfo.size
                                         )
                                     openInputDialog.value = true
@@ -565,7 +671,7 @@ private fun TablePrice(
                                             size = size,
                                             label = "Price",
                                             data = "0.0",
-                                            data2="0",
+                                            data2 = "0",
                                             index = productInfo.size
                                         )
                                     openInputDialog.value = true

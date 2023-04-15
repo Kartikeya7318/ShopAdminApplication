@@ -235,7 +235,7 @@ private fun EditBox(subCategoryViewModel: SubCategoryViewModel) {
                 )
                 subCategoryViewModel.updateSubCat(
                     NewSubCategory(
-                        categoryId= newcategoryId.value.toInt(),
+                        categoryId = newcategoryId.value.toInt(),
                         subCategoryName = newsubCategoryName.value
                     ),
                     subCategoryId.value.toInt()
@@ -354,7 +354,10 @@ private fun EditBox(subCategoryViewModel: SubCategoryViewModel) {
                         return@Button
                     }
                     val imgFile = uriToFile(context = context, selectedImageUri!!)
-                    subCategoryViewModel.updateSubCatImg(id = subCategoryId.value.toInt(), img = imgFile)
+                    subCategoryViewModel.updateSubCatImg(
+                        id = subCategoryId.value.toInt(),
+                        img = imgFile
+                    )
 
                 }
             ) {
@@ -395,7 +398,7 @@ private fun AddBox(subCategoryViewModel: SubCategoryViewModel) {
             name = subCategoryScreenState.categories[i].name.toString()
         )
 //        if (subCategoryScreenState.categories[i].status == "Active")
-            catList.add(chipList)
+        catList.add(chipList)
         Constants.CATEGORIES = catList
     }
     androidx.compose.material.Surface(
@@ -459,13 +462,13 @@ private fun AddBox(subCategoryViewModel: SubCategoryViewModel) {
                     return@Button
                 }
                 val imgFile = uriToFile(context = context, selectedImageUri!!)
-                    subCategoryViewModel.newSubCat(
-                        NewSubCategory(
-                            categoryId=categoryId.value.toInt(),
-                            subCategoryName = newsubCategoryName.value
+                subCategoryViewModel.newSubCat(
+                    NewSubCategory(
+                        categoryId = categoryId.value.toInt(),
+                        subCategoryName = newsubCategoryName.value
                     ),
-                      imgFile
-                    )
+                    imgFile
+                )
 
             }
         ) {
@@ -489,7 +492,7 @@ private fun DeleteBox(subCategoryViewModel: SubCategoryViewModel) {
             name = subCategoryScreenState.categories[i].name.toString()
         )
 //        if (subCategoryScreenState.categories[i].status == "Active")
-            catList.add(chipList)
+        catList.add(chipList)
         Constants.CATEGORIES = catList
     }
     val subCatList: MutableList<ChipList> = mutableListOf()

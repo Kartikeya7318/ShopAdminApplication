@@ -152,4 +152,12 @@ interface AdminShopApi {
         @Path("id") id: Int,
         @Part("brandName") name: String
     ):Response<Retrofit>
+
+    @PUT("{id}/image")
+    @Multipart
+    suspend fun editProductImg(
+        @Header("Authorization") token: String,
+        @Part file: MultipartBody.Part,
+        @Path("id") id: Int,
+    ):Response<Retrofit>
 }

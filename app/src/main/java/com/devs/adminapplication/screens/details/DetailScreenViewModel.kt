@@ -16,7 +16,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.File
 import javax.inject.Inject
 
 data class DetailScreenState(
@@ -87,6 +90,28 @@ class DetailScreenViewModel @Inject constructor(
 //                _failReason.value = ex.message.toString()
                 Log.d("Update result", "failreason: " +ex.message.toString() )
             }
+        }
+    }
+
+    fun updateProductImg(id:Int,img: File){
+        val fileRequestBody = img.asRequestBody("image/*".toMediaTypeOrNull())
+        val filePart =
+            MultipartBody.Part.createFormData("files", img.name, fileRequestBody)
+        viewModelScope.launch {
+            try {
+                val response=api.editProductImg(
+                    token = myPreference.getStoredTag(),
+                    file = filePart,
+                    id = id
+                )
+                if (response.code()==200){
+                    //TODO
+                }
+            }catch (ex: Exception) {
+                //TODO
+                Log.d("LoginFlow", "failreason: " +ex.message.toString() )
+            }
+
         }
     }
 

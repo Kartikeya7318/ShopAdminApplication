@@ -14,10 +14,14 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
 import com.devs.adminapplication.models.productResponse.Product
 import com.devs.adminapplication.models.util.ChipList
 import com.devs.adminapplication.navigation.AdminScreens
@@ -146,28 +150,34 @@ private fun DataCard(
         shape = RoundedCornerShape(corner = CornerSize(16.dp)),
         elevation = 6.dp
     ) {
-        Column() {
+        Column(modifier = Modifier
+            .padding(horizontal = 12.dp)) {
 
             Surface(
                 modifier = Modifier
-                    .padding(12.dp)
+                    .padding(top = 12.dp)
                     .height(225.dp),
                 shape = RectangleShape,
                 elevation = 4.dp
             ) {
                 Image(
-                    painter = rememberImagePainter(data = product.productImg[0].url,
-                        builder = {
-                            crossfade(true)
-                            transformations()
-                        }),
+                    painter = rememberAsyncImagePainter(
+                        ImageRequest.Builder(LocalContext.current)
+                            .data(data = product.productImg[0].url).apply(block = fun ImageRequest.Builder.() {
+                                crossfade(true)
+                                transformations()
+                            }).build()
+                    ),
                     contentDescription = "Product Image"
                 )
 
 
             }
-            Text(text = product.id.toString())
-            Text(text = product.productName.toString())
+            Spacer(modifier = Modifier.size(10.dp))
+            Text(text = "Id : "+product.id.toString(), maxLines = 1)
+            Text(text = "Name : "+product.productName.toString(), maxLines = 1,overflow = TextOverflow.Ellipsis,)
+            Text(text = "Price : "+product.price.toString(), maxLines = 1)
+            Spacer(modifier = Modifier.size(10.dp))
         }
     }
 }
