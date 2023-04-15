@@ -3,6 +3,7 @@ package com.devs.adminapplication.network
 
 import com.devs.adminapplication.models.addProduct.AddProductResponse
 import com.devs.adminapplication.models.addProduct.ProductAdd
+import com.devs.adminapplication.models.categories.BrandList
 import com.devs.adminapplication.models.categories.CategoryList
 import com.devs.adminapplication.models.login.LoginRequest
 import com.devs.adminapplication.models.login.LoginResponse
@@ -32,15 +33,18 @@ interface AdminShopApi {
         @Query("status") status:String ="ALL"
     ): CategoryList
 
-
-    @GET("sub_category/1")
-    suspend fun getAllSubCategories(
-        @Header("Authorization") token: String
-    ): SubCategoryList
-    @GET("sub_category")
-    suspend fun getAllSubCategoriesDeleted(
+    @GET("brand/")
+    suspend fun getAllBrands(
         @Header("Authorization") token: String,
-        @Query("status") status:String ="DELETE",
+        @Query("status") status:String ="Active"
+    ): BrandList
+
+
+
+    @GET("sub_category")
+    suspend fun getAllSubCategories(
+        @Header("Authorization") token: String,
+        @Query("status") status:String ="Active",
     ): SubCategoryList
 
     @GET(Constants.SUB_PRODUCT_URL)
@@ -85,5 +89,67 @@ interface AdminShopApi {
         @Header("Authorization") token: String,
         @Part file: MultipartBody.Part,
         @Part("req") requestBody: RequestBody
+    ):Response<Retrofit>
+
+    @DELETE("sub_category/{id}")
+    suspend fun deleteSubCat(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+
+    ):Response<Retrofit>
+
+    @PUT("sub_category/{id}")
+    suspend fun editSubCat(
+        @Header("Authorization") token: String,
+        @Body requestBody: RequestBody,
+        @Path("id") id: Int,
+    ):Response<Retrofit>
+
+    @PUT("sub_category/{id}/image")
+    @Multipart
+    suspend fun editSubCatImg(
+        @Header("Authorization") token: String,
+        @Part file: MultipartBody.Part,
+        @Path("id") id: Int,
+    ):Response<Retrofit>
+
+    @POST("category/")
+    @FormUrlEncoded
+    suspend fun newCat(
+        @Header("Authorization") token: String,
+        @Field("catageryName") name: String
+    ):Response<Retrofit>
+
+    @DELETE("category/{id}")
+    suspend fun deleteCat(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        ):Response<Retrofit>
+
+    @PUT("category/{id}")
+    suspend fun editCat(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Query("catageryName") name: String
+    ):Response<Retrofit>
+
+    @POST("brand/{name}")
+    suspend fun newBrand(
+        @Header("Authorization") token: String,
+        @Path("name") name: String
+    ):Response<Retrofit>
+
+    @DELETE("brand/{id}")
+    suspend fun deleteBrand(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+    ):Response<Retrofit>
+
+    @PUT("brand/{id}")
+    @Multipart
+    suspend fun editBrand(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Part("brandName") name: String
     ):Response<Retrofit>
 }

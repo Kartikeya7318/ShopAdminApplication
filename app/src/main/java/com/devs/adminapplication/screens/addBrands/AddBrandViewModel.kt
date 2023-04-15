@@ -1,62 +1,55 @@
-package com.devs.adminapplication.screens.addCategories
+package com.devs.adminapplication.screens.addBrands
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.devs.adminapplication.models.categories.Category
+import com.devs.adminapplication.models.productResponse.Brand
 import com.devs.adminapplication.network.AdminShopApi
 import com.devs.adminapplication.repository.ProductsRepository
-import com.devs.adminapplication.screens.addSubCategories.NewSubCategory
 import com.devs.adminapplication.screens.details.DetailScreenState
 import com.devs.adminapplication.utils.MyPreference
-import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.File
 import javax.inject.Inject
 
-data class CategoryScreenState(
-    var categories: List<Category> = emptyList()
+data class AddBrandState(
+    var brands: List<Brand> = emptyList()
 )
+
 @HiltViewModel
-class AddCategoryViewModel @Inject constructor(
+class AddBrandViewModel @Inject constructor(
     private val repository: ProductsRepository,
     private val myPreference: MyPreference,
     private val api: AdminShopApi,
-): ViewModel(){
+):ViewModel(){
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
     private val _failReason = MutableStateFlow(" ")
     val failReason: StateFlow<String> = _failReason
-    private val _categoryScreenState= MutableStateFlow(DetailScreenState())
-    val categoryScreenState get() = _categoryScreenState.asStateFlow()
-    fun getAllCategories() {
-        Log.d("reload flow", "getAllCategories: ")
+    private val _addBrandState= MutableStateFlow(AddBrandState())
+    val addBrandState get() = _addBrandState.asStateFlow()
+
+    fun getAllBrands(){
         viewModelScope.launch {
-            val categories = repository.getAllCategories(myPreference.getStoredTag())
-            Log.d("reload flow", "getAllCategories: "+categories.data)
-            if (categories.data!=null) {
-                _categoryScreenState.value = _categoryScreenState.value.copy(
-                    categories = categories.data!!.categories
+            val brands= repository.getAllBrands(myPreference.getStoredTag())
+            Log.d("reload flow", "getAllBrands: "+brands.data)
+            if (brands.data!=null){
+                _addBrandState.value=_addBrandState.value.copy(
+                    brands= brands.data!!.brands
                 )
             }
         }
     }
 
-    fun newCat(categoryName:String){
-        Log.d("okhttp", "newCat: $categoryName")
+    fun newBrand(brandName:String){
         viewModelScope.launch {
             try {
-                val response=api.newCat(
+                val response=api.newBrand(
                     token = myPreference.getStoredTag(),
-                    name = categoryName
+                    name = brandName
                 )
                 if (response.code()==200){
                     //TODO
@@ -68,13 +61,12 @@ class AddCategoryViewModel @Inject constructor(
 
         }
     }
-
-    fun deleteSubCat(id: Int){
+    fun deleteBrand(id:Int){
         viewModelScope.launch {
             try {
-                val response=api.deleteCat(
+                val response=api.deleteBrand(
                     token = myPreference.getStoredTag(),
-                    id
+                    id=id
                 )
                 if (response.code()==200){
                     //TODO
@@ -86,11 +78,10 @@ class AddCategoryViewModel @Inject constructor(
 
         }
     }
-
-    fun updateCat(name: String,id: Int){
+    fun updateBrand(name: String,id: Int){
         viewModelScope.launch {
             try {
-                val response=api.editCat(
+                val response=api.editBrand(
                     token = myPreference.getStoredTag(),
                     id=id,
                     name = name
@@ -105,5 +96,4 @@ class AddCategoryViewModel @Inject constructor(
 
         }
     }
-
 }

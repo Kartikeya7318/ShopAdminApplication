@@ -92,6 +92,15 @@ fun AddProductScreen(
 
         Constants.SUBCATEGORIES = subCatList
     }
+    val brandList: MutableList<ChipList> = mutableListOf()
+    for (i in 0 until (homeScreenState.brands.size)) {
+        val chipList = ChipList(
+            id = homeScreenState.brands[i].id.toString(),
+            name = homeScreenState.brands[i].name.toString()
+        )
+        brandList.add(chipList)
+        Constants.BRAND = brandList
+    }
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -166,7 +175,7 @@ fun AddProductScreen(
             "Brand",
             focusManager,
             expanded3,
-            Constants.BRAND,
+            brandList,
             isError = error4
         )
 //        TextBox(quantity, "Quantity", focusManager)

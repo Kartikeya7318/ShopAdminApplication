@@ -1,8 +1,10 @@
 package com.devs.adminapplication.screens.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devs.adminapplication.models.categories.Category
+import com.devs.adminapplication.models.productResponse.Brand
 import com.devs.adminapplication.models.productResponse.Product
 import com.devs.adminapplication.models.subcategories.SubCategory
 import com.devs.adminapplication.repository.ProductsRepository
@@ -20,6 +22,7 @@ data class HomeScreenState(
     var isLoading: Boolean = false,
     var categories: List<Category> = emptyList(),
     var subCategories: List<SubCategory> = emptyList(),
+    var brands: List<Brand> = emptyList(),
     var products: List<Product>? = emptyList(),
 
     )
@@ -37,6 +40,17 @@ class HomeViewModel @Inject constructor(
 //        getProducts()
     }
 
+    fun getAllBrands(){
+        viewModelScope.launch {
+            val brands= repository.getAllBrands(myPreference.getStoredTag())
+            Log.d("reload flow", "getAllBrands: "+brands.data)
+            if (brands.data!=null){
+                _homeScreenState.value=_homeScreenState.value.copy(
+                    brands= brands.data!!.brands
+                )
+            }
+        }
+    }
     fun updateProductListCategory(productListCategory: String){
         _homeScreenState.value = _homeScreenState.value.copy(
             productListCategory = productListCategory
@@ -91,6 +105,7 @@ class HomeViewModel @Inject constructor(
                 })
             _homeScreenState.value=_homeScreenState.value.copy(productListSubCategory = _homeScreenState.value.subCategories[0].id.toString())
             getProducts()
+            getAllBrands()
         }
     }
 

@@ -109,7 +109,7 @@ private fun EditBox(categoryViewModel: AddCategoryViewModel) {
             id = categoryScreenState.categories[i].id.toString(),
             name = categoryScreenState.categories[i].name.toString()
         )
-        if (categoryScreenState.categories[i].status == "Active")
+//        if (categoryScreenState.categories[i].status == "Active")
             catList.add(chipList)
         Constants.CATEGORIES = catList
     }
@@ -158,7 +158,7 @@ private fun EditBox(categoryViewModel: AddCategoryViewModel) {
                 containerColor = PrimaryLight
             ),
             onClick = {
-                
+                categoryViewModel.updateCat(newCategoryName.value,categoryId.value.toInt())
             }
         ) {
             Text(
@@ -187,7 +187,7 @@ private fun AddBox(categoryViewModel: AddCategoryViewModel){
             containerColor = PrimaryLight
         ),
         onClick = {
-
+            categoryViewModel.newCat(categoryName = newCategoryName.value)
         }
     ) {
         Text(
@@ -208,7 +208,7 @@ private fun DeleteBox(categoryViewModel: AddCategoryViewModel){
             id = categoryScreenState.categories[i].id.toString(),
             name = categoryScreenState.categories[i].name.toString()
         )
-        if (categoryScreenState.categories[i].status == "Active")
+//        if (categoryScreenState.categories[i].status == "Active")
             catList.add(chipList)
         Constants.CATEGORIES = catList
     }
@@ -237,7 +237,7 @@ private fun DeleteBox(categoryViewModel: AddCategoryViewModel){
                 containerColor = PrimaryLight
             ),
             onClick = {
-
+                categoryViewModel.deleteSubCat(categoryId.value.toInt())
             }
         ) {
             Text(

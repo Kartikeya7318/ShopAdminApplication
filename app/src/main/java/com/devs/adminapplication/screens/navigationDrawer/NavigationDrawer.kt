@@ -24,12 +24,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.devs.adminapplication.R
 import com.devs.adminapplication.navigation.AdminScreens
@@ -61,11 +64,13 @@ fun DrawerHeader() {
             border = BorderStroke(width = 1.dp, color = Color.Black)
         ) {
             Image(
-                painter = rememberImagePainter(data = R.drawable.ic_pips,
-                    builder = {
-                        crossfade(true)
-                        transformations(CircleCropTransformation())
-                    }),
+                painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current).data(data = R.drawable.placeholder_img)
+                        .apply(block = fun ImageRequest.Builder.() {
+                            crossfade(true)
+                            transformations(CircleCropTransformation())
+                        }).build()
+                ),
                 contentDescription = ""
             )
 

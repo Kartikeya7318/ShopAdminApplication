@@ -67,7 +67,26 @@ class SubCategoryViewModel @Inject constructor(
         }
     }
     fun updateSubCat(subCategory:NewSubCategory,id: Int){
+//        val fileRequestBody = img.asRequestBody("image/*".toMediaTypeOrNull())
+//        val filePart =
+//            MultipartBody.Part.createFormData("file", img.name, fileRequestBody)
+        val requestBody = Gson().toJson(subCategory).toRequestBody("application/json".toMediaTypeOrNull())
+        viewModelScope.launch {
+            try {
+                val response=api.editSubCat(
+                    token = myPreference.getStoredTag(),
+                    requestBody = requestBody,
+                    id=id
+                )
+                if (response.code()==200){
+                    //TODO
+                }
+            }catch (ex: Exception) {
+                //TODO
+                Log.d("LoginFlow", "failreason: " +ex.message.toString() )
+            }
 
+        }
     }
     fun newSubCat(newSubCat: NewSubCategory,img: File){
         val fileRequestBody = img.asRequestBody("image/*".toMediaTypeOrNull())
@@ -86,6 +105,45 @@ class SubCategoryViewModel @Inject constructor(
                 }
             }catch (ex: Exception) {
                //TODO
+                Log.d("LoginFlow", "failreason: " +ex.message.toString() )
+            }
+
+        }
+    }
+    fun deleteSubCat(id: Int){
+        viewModelScope.launch {
+            try {
+                val response=api.deleteSubCat(
+                    token = myPreference.getStoredTag(),
+                    id
+                )
+                if (response.code()==200){
+                    //TODO
+                }
+            }catch (ex: Exception) {
+                //TODO
+                Log.d("LoginFlow", "failreason: " +ex.message.toString() )
+            }
+
+        }
+    }
+
+    fun updateSubCatImg(id:Int,img: File){
+        val fileRequestBody = img.asRequestBody("image/*".toMediaTypeOrNull())
+        val filePart =
+            MultipartBody.Part.createFormData("file", img.name, fileRequestBody)
+        viewModelScope.launch {
+            try {
+                val response=api.editSubCatImg(
+                    token = myPreference.getStoredTag(),
+                    file = filePart,
+                    id = id
+                )
+                if (response.code()==200){
+                    //TODO
+                }
+            }catch (ex: Exception) {
+                //TODO
                 Log.d("LoginFlow", "failreason: " +ex.message.toString() )
             }
 

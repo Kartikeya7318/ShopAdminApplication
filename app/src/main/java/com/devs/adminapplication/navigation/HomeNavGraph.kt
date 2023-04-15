@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.devs.adminapplication.screens.addBrands.AddBrandScreen
+import com.devs.adminapplication.screens.addBrands.AddBrandViewModel
 import com.devs.adminapplication.screens.addCategories.AddCategoryScreen
 import com.devs.adminapplication.screens.addCategories.AddCategoryViewModel
 import com.devs.adminapplication.screens.addProducts.AddProductScreen
@@ -41,7 +42,9 @@ fun HomeNavGraph(navController2: NavHostController, navControllerRoot: NavHostCo
             ProductInfoScreen(navController = navController2, addProductViewModel)
         }
         composable(AdminScreens.AddBrandScreen.name){
-            AddBrandScreen()
+            val brandViewModel= hiltViewModel<AddBrandViewModel>()
+            brandViewModel.getAllBrands()
+            AddBrandScreen(brandViewModel)
         }
         composable(AdminScreens.AddCategoryScreen.name){
             val categoryViewModel= hiltViewModel<AddCategoryViewModel>()

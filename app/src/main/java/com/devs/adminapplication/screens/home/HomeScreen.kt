@@ -52,8 +52,8 @@ fun HomeScreen(navController: NavController, homeViewModel: HomeViewModel = hilt
             id = homeScreenState.categories[i].id.toString(),
             name = homeScreenState.categories[i].name.toString()
         )
-        if (homeScreenState.categories[i].status == "Active")
-            catList.add(chipList)
+
+        catList.add(chipList)
         Constants.CATEGORIES = catList
     }
     val subCatList: MutableList<ChipList> = mutableListOf()

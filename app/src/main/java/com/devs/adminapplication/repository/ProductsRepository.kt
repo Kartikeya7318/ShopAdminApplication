@@ -1,6 +1,7 @@
 package com.devs.adminapplication.repository
 
 import android.util.Log
+import com.devs.adminapplication.models.categories.BrandList
 import com.devs.adminapplication.models.categories.CategoryList
 import com.devs.adminapplication.models.productResponse.Products
 import com.devs.adminapplication.models.subcategories.SubCategoryList
@@ -40,6 +41,15 @@ class ProductsRepository @Inject constructor(private val api: AdminShopApi,priva
 
 
 
+    suspend fun getAllBrands(token: String): DataOrException<BrandList, Boolean, Exception> {
+        val response=try {
+            Log.d("LoginFlow", "getAllCategories: "+token)
+            api.getAllBrands(token=token)
+        } catch (e:Exception){
+            return DataOrException(e=e)
+        }
+        return DataOrException(data = response)
+    }
     suspend fun getAllCategories(token: String): DataOrException<CategoryList, Boolean, Exception> {
         val response=try {
             Log.d("LoginFlow", "getAllCategories: "+token)
@@ -52,7 +62,7 @@ class ProductsRepository @Inject constructor(private val api: AdminShopApi,priva
     suspend fun getAllSubCategories(token: String): DataOrException<SubCategoryList, Boolean, Exception> {
         val response=try {
             Log.d("LoginFlow", "getAllCategories: "+token)
-            api.getAllSubCategoriesDeleted(token=token)
+            api.getAllSubCategories(token=token)
         } catch (e:Exception){
             return DataOrException(e=e)
         }

@@ -46,10 +46,10 @@ fun LoginScreen(
 
     //ui
     var email by remember {
-        mutableStateOf("")
+        mutableStateOf("amit11")
     }
     var password by remember {
-        mutableStateOf("")
+        mutableStateOf("test123")
     }
     var passwordVisibility by remember {
         mutableStateOf(true)
