@@ -38,7 +38,8 @@ class LoginViewModel @Inject constructor(
 
                 val loginRequest = LoginRequest(
                     userId = userId,
-                    password = password
+                    password = password,
+                    role="Admin"
                 )
                 val response = userRepo.loginUser(loginRequest = loginRequest)
                 if (response?.code() == 200) {

@@ -46,7 +46,7 @@ fun LoginScreen(
 
     //ui
     var email by remember {
-        mutableStateOf("amit11")
+        mutableStateOf("amit10")
     }
     var password by remember {
         mutableStateOf("test123")

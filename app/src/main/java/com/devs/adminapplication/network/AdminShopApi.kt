@@ -30,7 +30,7 @@ interface AdminShopApi {
     @GET("category/")
     suspend fun getAllCategories(
         @Header("Authorization") token: String,
-        @Query("status") status:String ="ALL"
+        @Query("status") status:String ="Active"
     ): CategoryList
 
     @GET("brand/")
@@ -145,19 +145,20 @@ interface AdminShopApi {
         @Path("id") id: Int,
     ):Response<Retrofit>
 
+
     @PUT("brand/{id}")
-    @Multipart
     suspend fun editBrand(
         @Header("Authorization") token: String,
         @Path("id") id: Int,
-        @Part("brandName") name: String
+        @Query("brandName") name: String
     ):Response<Retrofit>
 
-    @PUT("{id}/image")
+    @PUT("product/{prodid}/image/{imgid}")
     @Multipart
     suspend fun editProductImg(
         @Header("Authorization") token: String,
         @Part file: MultipartBody.Part,
-        @Path("id") id: Int,
+        @Path("prodid") prodid: Int,
+        @Path("imgid") imgid: Int,
     ):Response<Retrofit>
 }

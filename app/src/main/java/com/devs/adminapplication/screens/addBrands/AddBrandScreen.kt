@@ -186,7 +186,7 @@ private fun AddBox(brandViewModel: AddBrandViewModel) {
         }
     ) {
         androidx.compose.material3.Text(
-            text = "UPDATE DATA",
+            text = "DONE",
             color = Color.Black,
             fontSize = 17.sp
         )

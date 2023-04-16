@@ -96,28 +96,32 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
 
             val subcategories = repository.getAllSubCategories(myPreference.getStoredTag())
-            val finalList = mutableListOf<SubCategory>()
-            subcategories.data?.let { finalList.addAll(it.categories) }
-            subcategories.data?.categories = finalList
             _homeScreenState.value =
                 _homeScreenState.value.copy(subCategories = subcategories.data!!.categories.filter { subCategory ->
                     subCategory.categoryId == _homeScreenState.value.productListCategory.toInt()
                 })
-            _homeScreenState.value=_homeScreenState.value.copy(productListSubCategory = _homeScreenState.value.subCategories[0].id.toString())
-            getProducts()
-            getAllBrands()
+            val temp=_homeScreenState.value.subCategories
+            if (temp.isNotEmpty()) {
+                _homeScreenState.value =
+                    _homeScreenState.value.copy(productListSubCategory = temp[0].id.toString())
+                getProducts()
+                getAllBrands()
+            }else{
+                _homeScreenState.value =
+                    _homeScreenState.value.copy(products = emptyList())
+            }
         }
     }
 
-    fun updateSubCatList(productListCategory: String){
-        viewModelScope.launch {
-            val subcategories = repository.getAllSubCategories(myPreference.getStoredTag())
-
-            _homeScreenState.value =
-                _homeScreenState.value.copy(subCategories = subcategories.data?.categories?.filter { subCategory ->
-                    subCategory.categoryId == productListCategory.toInt()
-                } ?: emptyList())
-
-        }
-    }
+//    fun updateSubCatList(productListCategory: String){
+//        viewModelScope.launch {
+//            val subcategories = repository.getAllSubCategories(myPreference.getStoredTag())
+//
+//            _homeScreenState.value =
+//                _homeScreenState.value.copy(subCategories = subcategories.data?.categories?.filter { subCategory ->
+//                    subCategory.categoryId == productListCategory.toInt()
+//                } ?: emptyList())
+//
+//        }
+//    }
 }

@@ -320,20 +320,20 @@ fun DetailsScreen(
                     toggle = toggle.value
                 )
                 Spacer(modifier = Modifier.size(10.dp))
-                Text(
-                    text = "Price Table",
-                    color = TextFieldDefaults
-                        .outlinedTextFieldColors()
-                        .textColor(enabled = saveEnabled).value,
-                )
-                Spacer(modifier = Modifier.size(10.dp))
-                TablePrice(
-                    productInfo,
-                    saveEnabled,
-                    inputDialogState,
-                    openInputDialog,
-                    toggle = toggle.value
-                )
+//                Text(
+//                    text = "Price Table",
+//                    color = TextFieldDefaults
+//                        .outlinedTextFieldColors()
+//                        .textColor(enabled = saveEnabled).value,
+//                )
+//                Spacer(modifier = Modifier.size(10.dp))
+//                TablePrice(
+//                    productInfo,
+//                    saveEnabled,
+//                    inputDialogState,
+//                    openInputDialog,
+//                    toggle = toggle.value
+//                )
                 Spacer(modifier = Modifier.size(30.dp))
                 InputDialogView(
                     openDialog = openInputDialog,
@@ -461,7 +461,7 @@ fun DetailsScreen(
                                     openImageDialog.value = false
                                     imageSaveEnabled = false
                                     val imgFile = uriToFile(context = context, selectedImageUri!!)
-                                    detailScreenViewModel.updateProductImg(id.value.toInt(),imgFile);
+                                    detailScreenViewModel.updateProductImg(prodid = id.value.toInt(), imgid =product.productImg[0].id ,imgFile);
 //                                    detailScreenViewModel.updateProductOnServer(update, product.id)
 
                                 }) {

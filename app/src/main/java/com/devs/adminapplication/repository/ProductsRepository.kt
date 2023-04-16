@@ -63,9 +63,11 @@ class ProductsRepository @Inject constructor(private val api: AdminShopApi,priva
         val response=try {
             Log.d("LoginFlow", "getAllCategories: "+token)
             api.getAllSubCategories(token=token)
+
         } catch (e:Exception){
             return DataOrException(e=e)
         }
+//        Log.d("SubCatNullCheck", "getAllCategories: "+response)
         return DataOrException(data = response)
     }
 }

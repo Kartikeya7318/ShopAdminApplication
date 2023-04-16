@@ -7,5 +7,8 @@ data class LoginRequest(
     var userId: String,
 
     @SerializedName("password")
-    var password: String
+    var password: String,
+
+    @SerializedName("role")
+    var role: String
 )

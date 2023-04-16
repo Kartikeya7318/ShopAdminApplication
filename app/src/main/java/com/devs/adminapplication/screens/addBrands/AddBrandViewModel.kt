@@ -8,11 +8,14 @@ import com.devs.adminapplication.network.AdminShopApi
 import com.devs.adminapplication.repository.ProductsRepository
 import com.devs.adminapplication.screens.details.DetailScreenState
 import com.devs.adminapplication.utils.MyPreference
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
 
 data class AddBrandState(
@@ -79,6 +82,7 @@ class AddBrandViewModel @Inject constructor(
         }
     }
     fun updateBrand(name: String,id: Int){
+
         viewModelScope.launch {
             try {
                 val response=api.editBrand(

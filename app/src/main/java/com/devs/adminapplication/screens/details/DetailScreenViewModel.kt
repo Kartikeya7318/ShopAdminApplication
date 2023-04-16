@@ -93,7 +93,7 @@ class DetailScreenViewModel @Inject constructor(
         }
     }
 
-    fun updateProductImg(id:Int,img: File){
+    fun updateProductImg(prodid:Int,imgid:Int,img: File){
         val fileRequestBody = img.asRequestBody("image/*".toMediaTypeOrNull())
         val filePart =
             MultipartBody.Part.createFormData("files", img.name, fileRequestBody)
@@ -102,7 +102,8 @@ class DetailScreenViewModel @Inject constructor(
                 val response=api.editProductImg(
                     token = myPreference.getStoredTag(),
                     file = filePart,
-                    id = id
+                    prodid = prodid,
+                    imgid = imgid
                 )
                 if (response.code()==200){
                     //TODO
