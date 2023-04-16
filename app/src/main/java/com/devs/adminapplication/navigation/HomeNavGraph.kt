@@ -17,6 +17,8 @@ import com.devs.adminapplication.screens.addSubCategories.AddSubCategoryScreen
 import com.devs.adminapplication.screens.addSubCategories.SubCategoryViewModel
 import com.devs.adminapplication.screens.home.HomeScreen
 import com.devs.adminapplication.screens.home.HomeViewModel
+import com.devs.adminapplication.screens.orderHistory.OrderHistoryScreen
+import com.devs.adminapplication.screens.orderHistory.OrderHistoryViewmodel
 
 @Composable
 fun HomeNavGraph(navController2: NavHostController, navControllerRoot: NavHostController) {
@@ -55,6 +57,10 @@ fun HomeNavGraph(navController2: NavHostController, navControllerRoot: NavHostCo
             val subCategoryViewModel= hiltViewModel<SubCategoryViewModel>()
             subCategoryViewModel.getAllCategories()
             AddSubCategoryScreen(subCategoryViewModel)
+        }
+        composable(AdminScreens.OrderHistoryScreen.name) {
+            val orderHistoryViewmodel= hiltViewModel<OrderHistoryViewmodel>()
+           OrderHistoryScreen(orderHistoryViewmodel)
         }
 
 

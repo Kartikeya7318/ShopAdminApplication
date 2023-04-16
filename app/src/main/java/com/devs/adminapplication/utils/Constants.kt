@@ -19,5 +19,7 @@ object Constants {
     var BRAND:MutableList<ChipList> = mutableListOf(ChipList(id="4", name = "Hugo"))
     val SIZES:MutableList<ChipList> = mutableListOf(ChipList(id="4", name = "Hugo"))
 
+    val ORDERHISTORY="{\"errorCode\":\"000000\",\"errorMessage\":\"SUCCESS\",\"orderHistory\":[{\"orderId\":12,\"userId\":\"amit11\",\"totalAmount\":500.0,\"color\":\"BLUE\",\"size\":\"XL\",\"quantity\":9},{\"orderId\":13,\"userId\":\"amit11\",\"totalAmount\":490.0,\"color\":\"RED\",\"size\":\"XL\",\"quantity\":5}]}"
+
 
 }

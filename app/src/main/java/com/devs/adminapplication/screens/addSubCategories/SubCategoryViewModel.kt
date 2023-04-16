@@ -95,17 +95,17 @@ class SubCategoryViewModel @Inject constructor(
         val requestBody = Gson().toJson(newSubCat).toRequestBody("application/json".toMediaTypeOrNull())
         viewModelScope.launch {
             try {
-                val response=api.newSubCat(
+                val response = api.newSubCat(
                     token = myPreference.getStoredTag(),
                     filePart,
                     requestBody = requestBody
                 )
-                if (response.code()==200){
+                if (response.code() == 200) {
                     //TODO
                 }
-            }catch (ex: Exception) {
-               //TODO
-                Log.d("LoginFlow", "failreason: " +ex.message.toString() )
+            } catch (ex: Exception) {
+                //TODO
+                Log.d("LoginFlow", "failreason: " + ex.message.toString())
             }
 
         }

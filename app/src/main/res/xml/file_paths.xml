@@ -1,0 +1,3 @@
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <files-path name="my_excel_file" path="my_excel_file.xlsx" />
+</paths>

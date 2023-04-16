@@ -10,6 +10,7 @@ import com.devs.adminapplication.models.login.LoginResponse
 import com.devs.adminapplication.models.productResponse.Products
 import com.devs.adminapplication.models.subcategories.SubCategoryList
 import com.devs.adminapplication.models.updateProduct.ProductUpdate
+import com.devs.adminapplication.screens.orderHistory.OrderHistoryResponse
 import com.devs.adminapplication.utils.Constants
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -161,4 +162,12 @@ interface AdminShopApi {
         @Path("prodid") prodid: Int,
         @Path("imgid") imgid: Int,
     ):Response<Retrofit>
+
+
+    @GET("user/orderHistory/admin")
+    suspend fun getOrderHistory(
+        @Query("from") fromDate: String,
+        @Query("to") toDate: String,
+        @Header("Authorization") token: String
+    ): OrderHistoryResponse
 }

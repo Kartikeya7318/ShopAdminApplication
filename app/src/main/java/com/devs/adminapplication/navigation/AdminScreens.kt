@@ -8,7 +8,8 @@ enum class AdminScreens {
     DetailsScreen,
     AddCategoryScreen,
     AddSubCategoryScreen,
-    AddBrandScreen
+    AddBrandScreen,
+    OrderHistoryScreen
 
 }
 enum class Graph {

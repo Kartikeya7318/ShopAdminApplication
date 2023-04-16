@@ -222,11 +222,11 @@ fun Menu(
                         route = AdminScreens.AddBrandScreen.name
                     ),
                     MenuItem(
-                        id = "newOrders",
-                        title = "New Orders",
+                        id = "orderHistory",
+                        title = "Order History",
                         contentDescription = "feedback",
                         icon = Icons.Default.Info,
-                        route = ""
+                        route = AdminScreens.OrderHistoryScreen.name
                     ),
                     MenuItem(
                         id = "ongoingOrders",

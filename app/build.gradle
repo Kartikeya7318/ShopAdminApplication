@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "com.devs.adminapplication"
-        minSdk 21
+        minSdk 26
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -39,7 +39,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.1.1'
+        kotlinCompilerExtensionVersion '1.4.1'
     }
     packagingOptions {
         resources {
@@ -56,7 +56,7 @@ dependencies {
     implementation 'androidx.activity:activity-compose:1.6.1'
     implementation "androidx.compose.ui:ui:$compose_ui_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
-    implementation 'androidx.compose.material:material:1.3.1'
+    implementation 'androidx.compose.material:material:1.4.1'
     implementation 'androidx.compose.material3:material3:1.0.1'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
@@ -101,5 +101,13 @@ dependencies {
 
     //datatable
     implementation 'androidx.ui:ui-material:0.1.0-dev04'
+
+//    //apache json to xls
+//    implementation 'org.apache.poi:poi:5.2.0'
+    implementation 'org.apache.poi:poi-ooxml:5.2.0'
+
+    //calender
+    implementation 'com.maxkeppeler.sheets-compose-dialogs:core:1.0.2' // necessary
+    implementation 'com.maxkeppeler.sheets-compose-dialogs:calendar:1.0.2'
 
 }

@@ -1,5 +1,6 @@
 package com.devs.adminapplication
 
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -9,6 +10,8 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
 import androidx.preference.PreferenceManager
 
@@ -33,6 +36,17 @@ class MainActivity : ComponentActivity() {
         var prefs=PreferenceManager.getDefaultSharedPreferences(this)
         var token:String?=null
         super.onCreate(savedInstanceState)
+//        // Check if the permission has already been granted
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.)
+//            != PackageManager.PERMISSION_GRANTED) {
+//            // Permission is not granted, request it
+//            ActivityCompat.requestPermissions(this,
+//                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+//                MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE)
+//        } else {
+//            // Permission already granted, do your work
+//        }
+
         setContent {
             AdminApplicationTheme {
                 // A surface container using the 'background' color from the theme
