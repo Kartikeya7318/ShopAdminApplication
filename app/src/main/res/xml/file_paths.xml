@@ -1,3 +1,5 @@
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
-    <files-path name="my_excel_file" path="my_excel_file.xlsx" />
+    <external-path name="download" path="Download/"/>
+    <external-path name="documents" path="Documents/"/>
+    <external-path name="pictures" path="Pictures/"/>
 </paths>

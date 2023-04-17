@@ -200,7 +200,7 @@ fun DetailsScreen(
                                 IconButton(onClick = {
                                     imageSaveEnabled = false
                                     if (selectedImageUri!=null)
-                                    openImageDialog.value = true
+                                        openImageDialog.value = true
                                 }) {
                                     Icon(
                                         imageVector = Icons.Rounded.Done,
