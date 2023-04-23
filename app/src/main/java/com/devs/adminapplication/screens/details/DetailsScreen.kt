@@ -317,7 +317,9 @@ fun DetailsScreen(
                     saveEnabled,
                     inputDialogState,
                     openInputDialog,
-                    toggle = toggle.value
+                    toggle = toggle.value,
+                    colors = product.colors,
+                    sizes = product.sizes
                 )
                 Spacer(modifier = Modifier.size(10.dp))
 //                Text(
@@ -494,16 +496,18 @@ private fun TableQuantity(
     saveEnabled: Boolean,
     inputDialogState: MutableState<inputDialogState>,
     openInputDialog: MutableState<Boolean>,
-    toggle: Boolean
+    toggle: Boolean,
+    colors:List<String>,
+    sizes:List<String>
 ) {
-    val colors = mutableListOf<String>()
-    val sizes = listOf<String>("S", "M", "L", "XL", "XXL")
-    for (it in productInfo.indices) {
-        val color = productInfo[it].color
-//        val size = productDetails[it].size
-        if (!colors.contains(color)) colors.add(color)
-//        if (!sizes.contains(size)) sizes.add(size)
-    }
+//    val colors = mutableListOf<String>()
+//    val sizes = listOf<String>("S", "M", "L", "XL", "XXL")
+//    for (it in productInfo.indices) {
+//        val color = productInfo[it].color
+////        val size = productDetails[it].size
+//        if (!colors.contains(color)) colors.add(color)
+////        if (!sizes.contains(size)) sizes.add(size)
+//    }
     Log.d("listupdate", "DetailsScreen: " + colors)
     Log.d("listupdate", "DetailsScreen: " + sizes)
 
@@ -596,7 +600,8 @@ private fun TablePrice(
     toggle: Boolean
 ) {
     val colors = mutableListOf<String>()
-    val sizes = listOf<String>("S", "M", "L", "XL", "XXL")
+    val sizes = mutableListOf<String>()
+
     for (it in productInfo.indices) {
         val color = productInfo[it].color
 //        val size = productDetails[it].size

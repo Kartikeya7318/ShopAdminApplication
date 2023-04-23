@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.ui.text.toUpperCase
 import com.devs.adminapplication.models.addProduct.ProductInfo
 import com.devs.adminapplication.navigation.AdminScreens
 import com.devs.adminapplication.screens.componenents.TextBox
@@ -41,6 +42,7 @@ import com.devs.adminapplication.screens.componenents.TextBoxSelectable
 import com.devs.adminapplication.ui.theme.BorderColor
 import com.devs.adminapplication.ui.theme.PrimaryDark
 import com.devs.adminapplication.ui.theme.PrimaryLight
+import java.util.*
 
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -133,13 +135,13 @@ fun TypeBox(i: Int, productInfo: MutableList<ProductInfo>, ) {
         var price = remember { mutableStateOf("") }
         TextBox(name = price, label = "Price", focusManager = LocalFocusManager.current)
         var size = remember { mutableStateOf("") }
-//        TextBox(name = size, label = "Size", focusManager = LocalFocusManager.current)
-        val expanded1 = remember { mutableStateOf(false) }
-        TextBoxSelectableSizes(name = size, label = "Size", focusManager =LocalFocusManager.current , expanded =expanded1)
+        TextBox(name = size, label = "Size", focusManager = LocalFocusManager.current)
+//        val expanded1 = remember { mutableStateOf(false) }
+//        TextBoxSelectableSizes(name = size, label = "Size", focusManager =LocalFocusManager.current , expanded =expanded1)
         var quantity = remember { mutableStateOf("") }
         TextBox(name = quantity, label = "Quantity", focusManager = LocalFocusManager.current)
-        product.color=color.value
-        product.size=size.value
+        product.color= color.value.trim().uppercase(Locale.ROOT)
+        product.size=size.value.trim().uppercase(Locale.ROOT)
         try {
             product.price = price.value.toInt()
             product.quantity =  quantity.value.toInt()

@@ -12,5 +12,7 @@ data class Product(
     val status: Any,
     val productDetails: List<ProductDetail>,
     val productImg: List<ProductImg>,
+    val colors:List<String>,
+    val sizes:List<String>
 
     )

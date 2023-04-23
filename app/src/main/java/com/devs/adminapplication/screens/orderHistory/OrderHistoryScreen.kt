@@ -228,7 +228,18 @@ data class OrderHistory(
     val totalAmount: Double,
     val color: String,
     val size: String,
-    val quantity: Int
+    val quantity: Int,
+    val address: Address
+)
+data class Address(
+    val orderId: Int=0,
+    val name: String="",
+    val address1: String="",
+    val address2: String="",
+    val city: String="",
+    val state: String="",
+    val mobileNo: String="",
+    val pincode: String="",
 )
 
 data class OrderHistoryResponse(
@@ -237,28 +248,28 @@ data class OrderHistoryResponse(
     val orderHistory: List<OrderHistory>
 )
 
-fun parseJson(jsonData: String): OrderHistoryResponse {
-    val jsonObject = JSONObject(jsonData)
-    val orderHistoryArray = jsonObject.getJSONArray("orderHistory")
-    val orderHistory = mutableListOf<OrderHistory>()
-    for (i in 0 until orderHistoryArray.length()) {
-        val orderObject = orderHistoryArray.getJSONObject(i)
-        val order = OrderHistory(
-            orderObject.getInt("orderId"),
-            orderObject.getString("userId"),
-            orderObject.getDouble("totalAmount"),
-            orderObject.getString("color"),
-            orderObject.getString("size"),
-            orderObject.getInt("quantity")
-        )
-        orderHistory.add(order)
-    }
-    return OrderHistoryResponse(
-        jsonObject.getString("errorCode"),
-        jsonObject.getString("errorMessage"),
-        orderHistory
-    )
-}
+//fun parseJson(jsonData: String): OrderHistoryResponse {
+//    val jsonObject = JSONObject(jsonData)
+//    val orderHistoryArray = jsonObject.getJSONArray("orderHistory")
+//    val orderHistory = mutableListOf<OrderHistory>()
+//    for (i in 0 until orderHistoryArray.length()) {
+//        val orderObject = orderHistoryArray.getJSONObject(i)
+//        val order = OrderHistory(
+//            orderObject.getInt("orderId"),
+//            orderObject.getString("userId"),
+//            orderObject.getDouble("totalAmount"),
+//            orderObject.getString("color"),
+//            orderObject.getString("size"),
+//            orderObject.getInt("quantity")
+//        )
+//        orderHistory.add(order)
+//    }
+//    return OrderHistoryResponse(
+//        jsonObject.getString("errorCode"),
+//        jsonObject.getString("errorMessage"),
+//        orderHistory
+//    )
+//}
 
 fun dataClassToExcel(orderHistoryList: List<OrderHistory>, fileName: String) {
     val workbook = XSSFWorkbook()
@@ -272,6 +283,13 @@ fun dataClassToExcel(orderHistoryList: List<OrderHistory>, fileName: String) {
     headerRow.createCell(3).setCellValue("Color")
     headerRow.createCell(4).setCellValue("Size")
     headerRow.createCell(5).setCellValue("Quantity")
+    headerRow.createCell(6).setCellValue("Name")
+    headerRow.createCell(7).setCellValue("Address 1")
+    headerRow.createCell(8).setCellValue("Address 2")
+    headerRow.createCell(9).setCellValue("City")
+    headerRow.createCell(10).setCellValue("State")
+    headerRow.createCell(11).setCellValue("Mobile Number")
+    headerRow.createCell(12).setCellValue("Pincode")
 
     // Create data rows
     for (i in orderHistoryList.indices) {
@@ -283,6 +301,15 @@ fun dataClassToExcel(orderHistoryList: List<OrderHistory>, fileName: String) {
         dataRow.createCell(3).setCellValue(order.color)
         dataRow.createCell(4).setCellValue(order.size)
         dataRow.createCell(5).setCellValue(order.quantity.toDouble())
+        if (order.address!=null) {
+            dataRow.createCell(6).setCellValue(order.address.name)
+            dataRow.createCell(7).setCellValue(order.address.address1)
+            dataRow.createCell(8).setCellValue(order.address.address2)
+            dataRow.createCell(9).setCellValue(order.address.city)
+            dataRow.createCell(10).setCellValue(order.address.state)
+            dataRow.createCell(11).setCellValue(order.address.mobileNo)
+            dataRow.createCell(12).setCellValue(order.address.pincode)
+        }
     }
 
     // Write the workbook to an Excel file
