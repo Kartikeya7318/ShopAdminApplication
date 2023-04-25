@@ -1,8 +1,10 @@
 package com.devs.adminapplication.screens.details
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,7 +18,6 @@ import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
@@ -29,8 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
+import com.devs.adminapplication.AdminApplication
 import com.devs.adminapplication.models.productResponse.ProductDetail
 import com.devs.adminapplication.models.updateProduct.ProductUpdate
 import com.devs.adminapplication.models.updateProduct.ProductUpdateInfo
@@ -38,11 +38,14 @@ import com.devs.adminapplication.models.updateProduct.ProductUpdateInfoWithKey
 import com.devs.adminapplication.models.util.ChipList
 import com.devs.adminapplication.navigation.AdminScreens
 import com.devs.adminapplication.screens.addProducts.uriToFile
+import com.devs.adminapplication.screens.componenents.AutoSlidingCarousel
 import com.devs.adminapplication.screens.componenents.TextBoxSelectable
 import com.devs.adminapplication.screens.componenents.TextBox
+import com.devs.adminapplication.ui.theme.PrimaryDark
 import com.devs.adminapplication.ui.theme.PrimaryLight
 import com.devs.adminapplication.ui.theme.PrimaryText
 import com.devs.adminapplication.utils.Constants
+import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.gson.Gson
 
 data class inputDialogState(
@@ -54,7 +57,7 @@ data class inputDialogState(
     val index: Int = 0
 )
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "MutableCollectionMutableState")
 @Composable
 fun DetailsScreen(
@@ -68,6 +71,8 @@ fun DetailsScreen(
     var subCategoryId = SubCategoryId
     var brandId = 0
     val detailScreenState by detailScreenViewModel.detailScreenState.collectAsState()
+    val loading = detailScreenViewModel.loading.collectAsState()
+    val failReason = detailScreenViewModel.failReason.collectAsState()
     var product = detailScreenState.product
     val scaffoldState = rememberScaffoldState()
     var saveEnabled by remember {
@@ -76,6 +81,10 @@ fun DetailsScreen(
     var imageSaveEnabled by remember {
         mutableStateOf(false)
     }
+    var updated by remember {
+        mutableStateOf(false)
+    }
+
 //    if (product!=null){
 //        detailScreenViewModel.getAllCategories()
 //        detailScreenViewModel.updateSubCatList(product.subCategory.categoryId.toString())
@@ -138,7 +147,9 @@ fun DetailsScreen(
             val CategoryMap = Constants.CATEGORIES.map { it.id to it.name }.toMap()
             val SubCategoryMap = Constants.SUBCATEGORIES.map { it.id to it.name }.toMap()
             val BrandMap = Constants.BRAND.map { it.id to it.name }.toMap()
-
+            var imageIndex by remember {
+                mutableStateOf(0)
+            }
             val id = remember { mutableStateOf(product.id.toString()) }
             val name = remember { mutableStateOf(product.productName) }
             val categoryId =
@@ -176,16 +187,7 @@ fun DetailsScreen(
 
                     elevation = 4.dp
                 ) {
-                    Surface(
-                        color = Color.Black.copy(alpha = if (imageSaveEnabled) 0f else 0.1f),
-                        modifier = Modifier.fillMaxSize(),
-                        onClick = {
-                            if (imageSaveEnabled)
-                                singlePhotoPickerLauncher.launch(
-                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                                )
-                        }
-                    ) {}
+
                     Column(
                         modifier = Modifier
                             .fillMaxHeight()
@@ -194,12 +196,13 @@ fun DetailsScreen(
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
+                            Text(text = "Image Id : "+imageIndex)
                             if (imageSaveEnabled) {
                                 IconButton(onClick = {
                                     imageSaveEnabled = false
-                                    if (selectedImageUri!=null)
+                                    if (selectedImageUri != null)
                                         openImageDialog.value = true
                                 }) {
                                     Icon(
@@ -224,29 +227,75 @@ fun DetailsScreen(
                             AsyncImage(
                                 model = selectedImageUri,
                                 contentDescription = null,
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        if (imageSaveEnabled) {
+                                            singlePhotoPickerLauncher.launch(
+                                                PickVisualMediaRequest(
+                                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                                )
+                                            )
+                                        } else {
+                                            Toast
+                                                .makeText(
+                                                    context,
+                                                    "Please enable image update",
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                .show()
+                                        }
+                                    },
                                 contentScale = ContentScale.Crop
                             )
                         } else {
-                            Image(
-                                painter = rememberAsyncImagePainter(
-                                    ImageRequest.Builder(LocalContext.current)
-                                        .data(data = product.productImg[0].url)
-                                        .apply(block = fun ImageRequest.Builder.() {
-                                            crossfade(true)
-                                            transformations()
-                                        }).build()
-                                ),
-                                contentDescription = "Product Image"
+                            AutoSlidingCarousel(
+                                itemsCount = product.productImg.size,
+                                itemContent = { index ->
+
+                                    AsyncImage(
+                                        model = product.productImg[index].url,
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .height(400.dp)
+                                            .clickable {
+                                                if (imageSaveEnabled) {
+                                                    imageIndex = index
+                                                    singlePhotoPickerLauncher.launch(
+                                                        PickVisualMediaRequest(
+                                                            ActivityResultContracts.PickVisualMedia.ImageOnly
+                                                        )
+                                                    )
+                                                } else {
+                                                    Toast
+                                                        .makeText(
+                                                            context,
+                                                            "Please enable image update",
+                                                            Toast.LENGTH_SHORT
+                                                        )
+                                                        .show()
+                                                }
+                                            },
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
                             )
                         }
+
 
                     }
 
 
                 }
 
-
+                if (loading.value == true)
+                    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator(color = PrimaryDark)
+                    }
+                if (failReason.value != " ") {
+                    Toast.makeText(context,failReason.value, Toast.LENGTH_SHORT).show()
+                    detailScreenViewModel.resetFailReason()
+                }
 
                 TextBox(name = id, label = "ID", focusManager = focusManager, enabled = false)
                 TextBox(
@@ -455,7 +504,7 @@ fun DetailsScreen(
                             Text(text = "Save Image Changes?")
                         },
                         text = {
-                            Text("Image of the product will be updated")
+                            Text("Image ${imageIndex+1} of the product will be updated")
                         },
                         confirmButton = {
                             Button(
@@ -463,7 +512,11 @@ fun DetailsScreen(
                                     openImageDialog.value = false
                                     imageSaveEnabled = false
                                     val imgFile = uriToFile(context = context, selectedImageUri!!)
-                                    detailScreenViewModel.updateProductImg(prodid = id.value.toInt(), imgid =product.productImg[0].id ,imgFile);
+                                    detailScreenViewModel.updateProductImg(
+                                        prodid = id.value.toInt(),
+                                        imgid = product.productImg[imageIndex].id,
+                                        imgFile
+                                    )
 //                                    detailScreenViewModel.updateProductOnServer(update, product.id)
 
                                 }) {
@@ -497,8 +550,8 @@ private fun TableQuantity(
     inputDialogState: MutableState<inputDialogState>,
     openInputDialog: MutableState<Boolean>,
     toggle: Boolean,
-    colors:List<String>,
-    sizes:List<String>
+    colors: List<String>,
+    sizes: List<String>
 ) {
 //    val colors = mutableListOf<String>()
 //    val sizes = listOf<String>("S", "M", "L", "XL", "XXL")

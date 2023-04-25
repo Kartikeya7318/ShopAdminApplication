@@ -1,6 +1,8 @@
 package com.devs.adminapplication.screens.details
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devs.adminapplication.models.categories.Category
@@ -13,6 +15,7 @@ import com.devs.adminapplication.utils.MyPreference
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -35,6 +38,10 @@ class DetailScreenViewModel @Inject constructor(
 ): ViewModel(){
     private val _detailScreenState= MutableStateFlow(DetailScreenState())
     val detailScreenState get() = _detailScreenState.asStateFlow()
+    private val _loading = MutableStateFlow(false)
+    val loading: StateFlow<Boolean> = _loading
+    private val _failReason = MutableStateFlow(" ")
+    val failReason: StateFlow<String> = _failReason
     fun updateSubCatList(productListCategory: String){
         viewModelScope.launch {
             val subcategories = repository.getAllSubCategories(myPreference.getStoredTag())
@@ -81,19 +88,20 @@ class DetailScreenViewModel @Inject constructor(
                     product=requestBody
                 )
                 if (response.code()==200){
-//                    _loading.value = false
+                    _loading.value = false
 //                    home()
                     Log.d("Update result", "Success: " +response.code() )
                 }
             }catch (ex: Exception) {
-//                _loading.value=false
-//                _failReason.value = ex.message.toString()
+                _loading.value=false
+                _failReason.value = ex.message.toString()
                 Log.d("Update result", "failreason: " +ex.message.toString() )
             }
         }
     }
 
-    fun updateProductImg(prodid:Int,imgid:Int,img: File){
+    fun updateProductImg(prodid: Int, imgid: Int, img: File){
+        _loading.value=true
         val fileRequestBody = img.asRequestBody("image/*".toMediaTypeOrNull())
         val filePart =
             MultipartBody.Part.createFormData("files", img.name, fileRequestBody)
@@ -107,13 +115,21 @@ class DetailScreenViewModel @Inject constructor(
                 )
                 if (response.code()==200){
                     //TODO
+                    _failReason.value = "Updated"
+                    _loading.value=false
+
                 }
             }catch (ex: Exception) {
                 //TODO
+                _loading.value=false
+                _failReason.value = ex.message.toString()
                 Log.d("LoginFlow", "failreason: " +ex.message.toString() )
             }
 
         }
+    }
+    fun resetFailReason(){
+        _failReason.value=" "
     }
 
 

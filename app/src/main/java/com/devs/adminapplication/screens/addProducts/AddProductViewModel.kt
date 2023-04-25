@@ -26,7 +26,7 @@ class AddProductViewModel @Inject constructor(
     private val myPreference: MyPreference
 ) : ViewModel() {
 
-    private lateinit var img: File
+    private lateinit var images: List<File>
     var nProducts: Int = 0
     private var _product = ProductAdd()
     val product get() = _product
@@ -40,7 +40,7 @@ class AddProductViewModel @Inject constructor(
         brandId: String,
         price: String,
         nProducts: Int,
-        img: File
+        images: List<File>
     ) {
         _product = _product.copy(
             name = name,
@@ -48,7 +48,7 @@ class AddProductViewModel @Inject constructor(
             brandId = brandId.toInt(),
             price = price,
         )
-        this.img = img
+        this.images = images
         this.nProducts = nProducts
     }
 
@@ -62,35 +62,21 @@ class AddProductViewModel @Inject constructor(
     fun addProductToServer(productInfoList: List<ProductInfo>,home: () -> Unit) {
         _loading.value=true
         setProductDetails(productInfoList = productInfoList)
-        val fileRequestBody = img.asRequestBody("image/*".toMediaTypeOrNull())
-        val filePart =
-            MultipartBody.Part.createFormData("files", img.name, fileRequestBody)
+        val fileparts=ArrayList<MultipartBody.Part>()
+        for (img in images) {
+            val fileRequestBody = img.asRequestBody("image/*".toMediaTypeOrNull())
+            val filePart =
+                MultipartBody.Part.createFormData("files", img.name, fileRequestBody)
+            fileparts.add(filePart)
+        }
 
-        val newProductAdd = ProductAdd(
-            name = "Women\'s Half Sleeved T-Shirt",
-            subCategoryId = 18,
-            brandId = 4,
-            price = "450 - 900",
-            productInfo = listOf(
-                ProductInfo(
-                    size = "XL",
-                    color = "BLACK",
-                    price = 490,
-                    quantity = 10
-                )
-            )
-        )
 
-//        Log.d("Datacheck", "addProductToServer: new product "+ Gson().toJson(newProductAdd))
-//        Log.d("Datacheck", "addProductToServer: product "+Gson().toJson(product))
-//        Log.d("Datacheck", "addProductToServer: new product "+newProductAdd.toString().toRequestBody("application/json".toMediaTypeOrNull()))
-//        Log.d("Datacheck", "addProductToServer: product "+product.toString().toRequestBody("application/json".toMediaTypeOrNull()))
         val requestBody = Gson().toJson(product).toRequestBody("application/json".toMediaTypeOrNull())
         viewModelScope.launch {
             try {
                 val response=api.uploadProduct(
                     token = myPreference.getStoredTag(),
-                    filePart,
+                    fileparts,
                     requestBody = requestBody
                 )
                 if (response.code()==200){

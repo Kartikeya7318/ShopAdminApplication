@@ -72,7 +72,7 @@ interface AdminShopApi {
     @Multipart
     suspend fun uploadProduct(
         @Header("Authorization") token: String,
-        @Part file: MultipartBody.Part,
+        @Part file: List<MultipartBody.Part>,
         @Part("req") requestBody: RequestBody
     ):Response<Retrofit>
 
