@@ -196,9 +196,10 @@ fun DetailsScreen(
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = "Image Id : "+imageIndex)
+                            Text(text = "Image Number : "+imageIndex)
                             if (imageSaveEnabled) {
                                 IconButton(onClick = {
                                     imageSaveEnabled = false
