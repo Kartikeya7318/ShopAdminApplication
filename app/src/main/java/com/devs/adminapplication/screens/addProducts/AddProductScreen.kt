@@ -11,15 +11,19 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyRow
+
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
@@ -27,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.text.isDigitsOnly
@@ -34,6 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.devs.adminapplication.R
 import com.devs.adminapplication.models.util.ChipList
 import com.devs.adminapplication.navigation.AdminScreens
@@ -43,10 +49,17 @@ import com.devs.adminapplication.screens.componenents.isInteger
 import com.devs.adminapplication.screens.home.HomeViewModel
 import com.devs.adminapplication.ui.theme.PrimaryLight
 import com.devs.adminapplication.utils.Constants
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerState
+import kotlinx.coroutines.delay
 import java.io.File
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "SuspiciousIndentation")
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
+@OptIn(
+    ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class,
+    ExperimentalFoundationApi::class, ExperimentalPagerApi::class
+)
 @Composable
 fun AddProductScreen(
     navController: NavController,
@@ -59,6 +72,13 @@ fun AddProductScreen(
     val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri -> selectedImageUri = uri }
+    )
+    var selectedImageUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
+    val multiplePhotosPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickMultipleVisualMedia(),
+        onResult = { uris ->
+            selectedImageUris = uris
+        }
     )
     val context = LocalContext.current
     val name = remember { mutableStateOf("") }
@@ -119,18 +139,31 @@ fun AddProductScreen(
             shape = RectangleShape,
             elevation = 4.dp,
             onClick = {
-                singlePhotoPickerLauncher.launch(
+                multiplePhotosPickerLauncher.launch(
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                 )
             }
         ) {
-            if (selectedImageUri != null) {
-                AsyncImage(
-                    model = selectedImageUri,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxWidth(),
-                    contentScale = ContentScale.Crop
+            if (selectedImageUris.isNotEmpty()) {
+//                AsyncImage(
+//                    model = selectedImageUris[0],
+//                    contentDescription = null,
+//                    modifier = Modifier.fillMaxWidth(),
+//                    contentScale = ContentScale.Crop
+//                )
+
+                AutoSlidingCarousel(
+                    itemsCount = selectedImageUris.size,
+                    itemContent = { index ->
+                        AsyncImage(
+                            model = selectedImageUris[index],
+                            contentDescription = null,
+                            modifier = Modifier.height(200.dp),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 )
+
             } else {
                 Image(
                     painter = painterResource(id = R.drawable.placeholder_img),
@@ -201,11 +234,11 @@ fun AddProductScreen(
                     Toast.makeText(context, "Fields in red are empty", Toast.LENGTH_SHORT).show()
                     return@Button
                 }
-                if (selectedImageUri == null) {
+                if (selectedImageUris.isNotEmpty()) {
                     Toast.makeText(context, "Image Required", Toast.LENGTH_SHORT).show()
                     return@Button
                 }
-                val imgFile = uriToFile(context = context, selectedImageUri!!)
+                val imgFile = uriToFile(context = context, selectedImageUris[0])
                 val CategoryMap = Constants.CATEGORIES.map { it.name to it.id }.toMap()
                 val SubCategoryMap = Constants.SUBCATEGORIES.map { it.name to it.id }.toMap()
                 val BrandMap = Constants.BRAND.map { it.name to it.id }.toMap()
@@ -263,6 +296,88 @@ fun uriToFile(context: Context, uri: Uri): File {
     val filePath = cursor?.getString(filePathColumn!!)
     cursor?.close()
     return File(filePath)
+}
+
+@Composable
+fun IndicatorDot(
+    modifier: Modifier = Modifier,
+    size: Dp,
+    color: Color
+) {
+    Box(
+        modifier = modifier
+            .size(size)
+            .clip(CircleShape)
+            .background(color)
+    )
+}
+
+@Composable
+fun DotsIndicator(
+    modifier: Modifier = Modifier,
+    totalDots: Int,
+    selectedIndex: Int,
+    selectedColor: Color = PrimaryLight ,
+    unSelectedColor: Color = Color.Gray,
+    dotSize: Dp
+) {
+    LazyRow(
+        modifier = modifier
+            .wrapContentWidth()
+            .wrapContentHeight()
+    ) {
+        items(totalDots) { index ->
+            IndicatorDot(
+                color = if (index == selectedIndex) selectedColor else unSelectedColor,
+                size = dotSize
+            )
+
+            if (index != totalDots - 1) {
+                Spacer(modifier = Modifier.padding(horizontal = 2.dp))
+            }
+        }
+    }
+}
+@OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
+@Composable
+fun AutoSlidingCarousel(
+    modifier: Modifier = Modifier,
+    autoSlideDuration: Long = 10000L,
+    pagerState: PagerState = remember { PagerState() },
+    itemsCount: Int,
+    itemContent: @Composable (index: Int) -> Unit,
+) {
+    val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
+
+    LaunchedEffect(pagerState.currentPage) {
+        delay(autoSlideDuration)
+        pagerState.animateScrollToPage((pagerState.currentPage + 1) % itemsCount)
+    }
+
+    Box(
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        HorizontalPager(count = itemsCount, state = pagerState) { page ->
+            itemContent(page)
+        }
+
+        // you can remove the surface in case you don't want
+        // the transparant bacground
+        Surface(
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .align(Alignment.BottomCenter),
+            shape = CircleShape,
+            color = Color.Black.copy(alpha = 0.5f)
+        ) {
+            DotsIndicator(
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                totalDots = itemsCount,
+                selectedIndex = if (isDragged) pagerState.currentPage else pagerState.targetPage,
+                dotSize = 8.dp
+            )
+        }
+    }
 }
 
 
