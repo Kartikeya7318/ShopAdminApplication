@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
@@ -96,10 +97,17 @@ fun HomeScreen(navController: NavController, homeViewModel: HomeViewModel = hilt
             }
 
         }
+        if(homeScreenState.isLoading){
+            Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                CircularProgressIndicator(color = PrimaryDark)
+            }
 
-        itembox(homeScreenState.products) { id ->
-            navController.navigate(route = AdminScreens.DetailsScreen.name + "/$id" + "/${homeScreenState.productListSubCategory}")
+        }else{
+            itembox(homeScreenState.products) { id ->
+                navController.navigate(route = AdminScreens.DetailsScreen.name + "/$id" + "/${homeScreenState.productListSubCategory}")
+            }
         }
+
 
     }
 

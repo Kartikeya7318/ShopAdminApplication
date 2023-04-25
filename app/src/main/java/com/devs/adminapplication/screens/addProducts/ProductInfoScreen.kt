@@ -19,6 +19,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
@@ -76,7 +77,9 @@ fun ProductInfoScreen(
             }
         }
         if (loading.value == true)
-            CircularProgressIndicator(color = PrimaryDark)
+            Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                CircularProgressIndicator(color = PrimaryDark)
+            }
         if (failReason.value != " ") {
             Toast.makeText(context, addProductViewModel.failReason.value, Toast.LENGTH_SHORT).show()
         }
@@ -99,8 +102,12 @@ fun ProductInfoScreen(
 //                addProductViewModel.setProductDetails(productInfo)
                 addProductViewModel.addProductToServer(productInfo){
                     Toast.makeText(context,"Product Upload Success",Toast.LENGTH_SHORT).show()
-                    navController.popBackStack()
-                    navController.navigate(AdminScreens.HomeScreen.name)
+
+                    navController.navigate(AdminScreens.HomeScreen.name){
+                        popUpTo(AdminScreens.ProductInfoScreen.name){
+                            inclusive=true
+                        }
+                    }
                 }
 
             },
@@ -132,8 +139,8 @@ fun TypeBox(i: Int, productInfo: MutableList<ProductInfo>, ) {
         Text(text ="Type : "+(i+1).toString() )
         var color = remember { mutableStateOf("") }
         TextBox(name = color, label = "Color", focusManager = LocalFocusManager.current)
-        var price = remember { mutableStateOf("") }
-        TextBox(name = price, label = "Price", focusManager = LocalFocusManager.current)
+//        var price = remember { mutableStateOf("") }
+//        TextBox(name = price, label = "Price", focusManager = LocalFocusManager.current)
         var size = remember { mutableStateOf("") }
         TextBox(name = size, label = "Size", focusManager = LocalFocusManager.current)
 //        val expanded1 = remember { mutableStateOf(false) }
@@ -143,7 +150,7 @@ fun TypeBox(i: Int, productInfo: MutableList<ProductInfo>, ) {
         product.color= color.value.trim().uppercase(Locale.ROOT)
         product.size=size.value.trim().uppercase(Locale.ROOT)
         try {
-            product.price = price.value.toInt()
+            product.price = 0
             product.quantity =  quantity.value.toInt()
         }catch (e: NumberFormatException) {
             // handle the exception here

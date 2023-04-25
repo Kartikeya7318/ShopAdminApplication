@@ -3,8 +3,8 @@ package com.devs.adminapplication.utils
 import com.devs.adminapplication.models.util.ChipList
 
 object Constants {
-    const val BASE_URL = "http://103.160.145.42/stockmanagement/api/"
-//    const val BASE_URL = "http://192.168.29.74:8080/stockmanagement/api/"
+//    const val BASE_URL = "http://103.160.145.42/stockmanagement/api/"
+    const val BASE_URL = "http://192.168.29.74:8080/stockmanagement/api/"
     const val ADD_PRODUCT_URL= "product"
     const val LOGIN_URL = "auth/token"
     const val ALL_PRODUCT_URL = "product/1"

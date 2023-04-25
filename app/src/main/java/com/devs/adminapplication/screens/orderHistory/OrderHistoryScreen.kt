@@ -49,6 +49,7 @@ import com.devs.adminapplication.models.productResponse.ProductDetail
 import com.devs.adminapplication.models.util.ChipList
 import com.devs.adminapplication.screens.details.cell
 import com.devs.adminapplication.screens.details.inputDialogState
+import com.devs.adminapplication.ui.theme.PrimaryDark
 import com.devs.adminapplication.ui.theme.PrimaryLight
 import com.maxkeppeker.sheets.core.models.base.rememberSheetState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
@@ -65,6 +66,7 @@ import java.util.*
 @Composable
 fun OrderHistoryScreen(orderHistoryViewmodel: OrderHistoryViewmodel) {
     val orderHistoryState by orderHistoryViewmodel.orderHistoryState.collectAsState()
+    val loading by orderHistoryViewmodel.loading.collectAsState();
     val context = LocalContext.current
     val date1text = remember { mutableStateOf("") }
     val date2text = remember { mutableStateOf("") }
@@ -81,17 +83,17 @@ fun OrderHistoryScreen(orderHistoryViewmodel: OrderHistoryViewmodel) {
     val fileDir =
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
     val file = File(fileDir, fileName)
-
+    val openFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { activityResult ->
+        if (activityResult.resultCode == RESULT_OK) {
+            // Handle success
+        }
+    }
     file.setReadable(true, false)
     file.setWritable(true, false)
     file.setExecutable(true, false)
     if (orderHistoryState.orderHistory.isNotEmpty()) {
-//                            val orderHistoryResponse = parseJson(Constants.ORDERHISTORY)
-//                            Log.d(
-//                                "json2xls",
-//                                "OrderHistoryScreen: " + orderHistoryResponse.toString()
-//                            )
-
         dataClassToExcel(orderHistoryState.orderHistory, file.absolutePath)
         Log.d("json2xls", "Path: " + file.absolutePath)
         Toast.makeText(
@@ -161,23 +163,42 @@ fun OrderHistoryScreen(orderHistoryViewmodel: OrderHistoryViewmodel) {
                 fontSize = 17.sp
             )
         }
+        var open=false
         Spacer(modifier = Modifier.size(10.dp))
+        if (loading) {
+            androidx.compose.material.CircularProgressIndicator(color = PrimaryDark)
+        } else {
+            open=true
+            if (orderHistoryState.orderHistory.isNotEmpty()) {
+                TableOrderHistory(orderHistory = orderHistoryState.orderHistory)
+                try {
+                    val uri = Uri.fromFile(file)
+                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                        setDataAndType(uri, getMimeType(file.absolutePath))
+                        flags =
+                            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    }
 
-//        val orderHistoryResponse = parseJson(Constants.ORDERHISTORY)
-//        TableOrderHistory(orderHistory = orderHistoryResponse.orderHistory)
-        if (orderHistoryState.orderHistory.isNotEmpty()) {
-            TableOrderHistory(orderHistory = orderHistoryState.orderHistory)
-        }
-        Spacer(modifier = Modifier.size(10.dp))
-        val openFileLauncher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.StartActivityForResult()
-        ) { activityResult ->
-            if (activityResult.resultCode == RESULT_OK) {
-                // Handle success
-            } else {
-                Toast.makeText(context, "Error opening file", Toast.LENGTH_SHORT).show()
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        val contentUri =
+                            getUriForFile(context, "com.devs.adminapplication.fileprovider", file)
+                        intent.setDataAndType(contentUri, getMimeType(file.absolutePath))
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+                    if (open){
+                        open=false
+                        openFileLauncher.launch(intent)
+                    }
+
+                } catch (e: IOException) {
+//                        setErrorMessage("Error opening file")
+                } catch (e: ActivityNotFoundException) {
+
+                }
             }
         }
+        Spacer(modifier = Modifier.size(10.dp))
+
         Text(
             text = outputmessage,
             modifier = Modifier.clickable {
@@ -191,7 +212,11 @@ fun OrderHistoryScreen(orderHistoryViewmodel: OrderHistoryViewmodel) {
                         }
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            val contentUri = getUriForFile(context,"com.devs.adminapplication.fileprovider",file)
+                            val contentUri = getUriForFile(
+                                context,
+                                "com.devs.adminapplication.fileprovider",
+                                file
+                            )
                             intent.setDataAndType(contentUri, getMimeType(file.absolutePath))
                             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                         }
@@ -231,15 +256,18 @@ data class OrderHistory(
     val quantity: Int,
     val address: Address
 )
+
 data class Address(
-    val orderId: Int=0,
-    val name: String="",
-    val address1: String="",
-    val address2: String="",
-    val city: String="",
-    val state: String="",
-    val mobileNo: String="",
-    val pincode: String="",
+    val orderId: Int = 0,
+    val name: String = "",
+    val address1: String = "",
+    val address2: String = "",
+    val city: String = "",
+    val state: String = "",
+    val mobileNo: String = "",
+    val pincode: String = "",
+    val paymentAmount: String = "",
+    val paymentType: String = ""
 )
 
 data class OrderHistoryResponse(
@@ -290,6 +318,8 @@ fun dataClassToExcel(orderHistoryList: List<OrderHistory>, fileName: String) {
     headerRow.createCell(10).setCellValue("State")
     headerRow.createCell(11).setCellValue("Mobile Number")
     headerRow.createCell(12).setCellValue("Pincode")
+    headerRow.createCell(13).setCellValue("Payment Type")
+    headerRow.createCell(14).setCellValue("Payment Amount")
 
     // Create data rows
     for (i in orderHistoryList.indices) {
@@ -301,7 +331,7 @@ fun dataClassToExcel(orderHistoryList: List<OrderHistory>, fileName: String) {
         dataRow.createCell(3).setCellValue(order.color)
         dataRow.createCell(4).setCellValue(order.size)
         dataRow.createCell(5).setCellValue(order.quantity.toDouble())
-        if (order.address!=null) {
+        if (order.address != null) {
             dataRow.createCell(6).setCellValue(order.address.name)
             dataRow.createCell(7).setCellValue(order.address.address1)
             dataRow.createCell(8).setCellValue(order.address.address2)
@@ -309,6 +339,8 @@ fun dataClassToExcel(orderHistoryList: List<OrderHistory>, fileName: String) {
             dataRow.createCell(10).setCellValue(order.address.state)
             dataRow.createCell(11).setCellValue(order.address.mobileNo)
             dataRow.createCell(12).setCellValue(order.address.pincode)
+            dataRow.createCell(13).setCellValue(order.address.paymentType)
+            dataRow.createCell(14).setCellValue(order.address.paymentAmount)
         }
     }
 

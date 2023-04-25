@@ -179,7 +179,7 @@ fun AddProductScreen(
             isError = error4
         )
 //        TextBox(quantity, "Quantity", focusManager)
-        TextBox(price, "Price Range", focusManager, isError = error5)
+        TextBox(price, "Price", focusManager, isError = error5)
         TextBox(nProducts, "Number of Types", focusManager, isError = error6)
 
 

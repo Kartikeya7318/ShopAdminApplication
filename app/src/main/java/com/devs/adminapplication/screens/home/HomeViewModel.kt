@@ -19,7 +19,7 @@ data class HomeScreenState(
 
     var productListCategory: String = "1",
     var productListSubCategory: String = "15",
-    var isLoading: Boolean = false,
+    var isLoading: Boolean = true,
     var categories: List<Category> = emptyList(),
     var subCategories: List<SubCategory> = emptyList(),
     var brands: List<Brand> = emptyList(),
@@ -66,13 +66,21 @@ class HomeViewModel @Inject constructor(
             val res = repository.getProducts(
                 token = myPreference.getStoredTag(), subCategoryId = productListSubCategory
             )
-
-            _homeScreenState.value = _homeScreenState.value.copy(
-                productListCategory = productListCategory,
-                productListSubCategory = productListSubCategory,
-                products = res.data?.products
-
-            )
+            if (res.data?.products?.isEmpty() == true){
+                _homeScreenState.value = _homeScreenState.value.copy(
+                    productListCategory = productListCategory,
+                    productListSubCategory = productListSubCategory,
+                    products = emptyList(),
+                    isLoading = false
+                )
+            }else {
+                _homeScreenState.value = _homeScreenState.value.copy(
+                    productListCategory = productListCategory,
+                    productListSubCategory = productListSubCategory,
+                    products = res.data?.products,
+                    isLoading = false
+                )
+            }
 
 
         }
@@ -108,7 +116,7 @@ class HomeViewModel @Inject constructor(
                 getAllBrands()
             }else{
                 _homeScreenState.value =
-                    _homeScreenState.value.copy(products = emptyList())
+                    _homeScreenState.value.copy(products = emptyList(), isLoading = false)
             }
         }
     }

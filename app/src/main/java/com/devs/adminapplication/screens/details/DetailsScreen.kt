@@ -291,7 +291,7 @@ fun DetailsScreen(
                 }
                 TextBox(
                     name = priceRange,
-                    label = "Price Range",
+                    label = "Price",
                     focusManager = focusManager,
                     enabled = saveEnabled
                 )
@@ -849,14 +849,14 @@ fun InputDialogView(
                         label = { Text(text = label) }
                     )
 
-                    if (label == "Quantity" && data2 == "0.0") {
-                        Spacer(modifier = Modifier.size(10.dp))
-                        OutlinedTextField(
-                            value = datastate2,
-                            onValueChange = { datastate2 = it },
-                            label = { Text(text = "Price") }
-                        )
-                    }
+//                    if (label == "Quantity" && data2 == "0.0") {
+//                        Spacer(modifier = Modifier.size(10.dp))
+//                        OutlinedTextField(
+//                            value = datastate2,
+//                            onValueChange = { datastate2 = it },
+//                            label = { Text(text = "Price") }
+//                        )
+//                    }
                 }
             },
             confirmButton = {
