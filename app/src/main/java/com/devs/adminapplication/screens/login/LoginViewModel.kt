@@ -48,8 +48,12 @@ class LoginViewModel @Inject constructor(
                     _token.value = loginResult.value?.token.toString()
                     Log.d("LoginFlow", "loginUser: " + _token.value)
                     myPreferences.setStoredTag("Bearer "+_token.value)
+                    myPreferences.setUserIdandPass(userId,password)
                     Log.d("LoginFlow", "loginUser: saved " + myPreferences.getStoredTag())
                     home()
+                } else if (response?.code()==401){
+                    _failReason.value="Unauthorized , Email or Password is wrong."
+                    _loading.value = false
                 } else {
                     if (response != null) {
                         _failReason.value = response.message()

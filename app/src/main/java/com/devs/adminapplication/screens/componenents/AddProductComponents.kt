@@ -26,6 +26,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.toSize
 import com.devs.adminapplication.models.util.ChipList
 
@@ -36,7 +37,8 @@ fun TextBox(
     label: String,
     focusManager: FocusManager,
     enabled: Boolean = true,
-    isError: MutableState<Boolean> = mutableStateOf(false)
+    isError: MutableState<Boolean> = mutableStateOf(false),
+    regex: Regex= Regex("^[a-zA-Z0-9 ]+$")
 ) {
     OutlinedTextField(
         value = name.value,
@@ -63,11 +65,14 @@ fun TextBox(
 
             ),
         enabled = enabled,
-        isError = isError.value,
+        isError = isError.value || (!name.value.matches(regex)&&name.value.isNotEmpty()),
         supportingText = {
             if (isError.value)
                 Text(text = "*Required")
-        }
+            else if (!name.value.matches(regex)&&name.value.isNotEmpty())
+                Text(text = "Invalid Input")
+        },
+
     )
 
 }

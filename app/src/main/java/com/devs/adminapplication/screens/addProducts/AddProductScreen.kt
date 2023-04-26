@@ -197,8 +197,8 @@ fun AddProductScreen(
             isError = error4
         )
 //        TextBox(quantity, "Quantity", focusManager)
-        TextBox(price, "Price", focusManager, isError = error5)
-        TextBox(nProducts, "Number of Types", focusManager, isError = error6)
+        TextBox(price, "Price", focusManager, isError = error5, regex = Regex("^[0-9]+$"))
+        TextBox(nProducts, "Number of Types", focusManager, isError = error6,regex = Regex("^[0-9]+$"))
 
 
         Button(
@@ -223,6 +223,8 @@ fun AddProductScreen(
                     Toast.makeText(context, "Image Required", Toast.LENGTH_SHORT).show()
                     return@Button
                 }
+                if(!price.value.matches(Regex("^[0-9]+$"))) return@Button
+                if(!nProducts.value.matches(Regex("^[0-9]+$"))) return@Button
                 val imgFile = ArrayList<File>()
                 for (imguri in selectedImageUris ){
                     imgFile.add(uriToFile(context = context, imguri))

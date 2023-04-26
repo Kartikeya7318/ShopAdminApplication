@@ -254,7 +254,8 @@ data class OrderHistory(
     val color: String,
     val size: String,
     val quantity: Int,
-    val address: Address
+    val address: Address,
+    val productName :String
 )
 
 data class Address(
@@ -311,15 +312,16 @@ fun dataClassToExcel(orderHistoryList: List<OrderHistory>, fileName: String) {
     headerRow.createCell(3).setCellValue("Color")
     headerRow.createCell(4).setCellValue("Size")
     headerRow.createCell(5).setCellValue("Quantity")
-    headerRow.createCell(6).setCellValue("Name")
-    headerRow.createCell(7).setCellValue("Address 1")
-    headerRow.createCell(8).setCellValue("Address 2")
-    headerRow.createCell(9).setCellValue("City")
-    headerRow.createCell(10).setCellValue("State")
-    headerRow.createCell(11).setCellValue("Mobile Number")
-    headerRow.createCell(12).setCellValue("Pincode")
-    headerRow.createCell(13).setCellValue("Payment Type")
-    headerRow.createCell(14).setCellValue("Payment Amount")
+    headerRow.createCell(6).setCellValue("Product Name")
+    headerRow.createCell(7).setCellValue("Name")
+    headerRow.createCell(8).setCellValue("Address 1")
+    headerRow.createCell(9).setCellValue("Address 2")
+    headerRow.createCell(10).setCellValue("City")
+    headerRow.createCell(11).setCellValue("State")
+    headerRow.createCell(12).setCellValue("Mobile Number")
+    headerRow.createCell(13).setCellValue("Pincode")
+    headerRow.createCell(14).setCellValue("Payment Type")
+    headerRow.createCell(15).setCellValue("Payment Amount")
 
     // Create data rows
     for (i in orderHistoryList.indices) {
@@ -331,16 +333,17 @@ fun dataClassToExcel(orderHistoryList: List<OrderHistory>, fileName: String) {
         dataRow.createCell(3).setCellValue(order.color)
         dataRow.createCell(4).setCellValue(order.size)
         dataRow.createCell(5).setCellValue(order.quantity.toDouble())
+        dataRow.createCell(6).setCellValue(order.productName)
         if (order.address != null) {
-            dataRow.createCell(6).setCellValue(order.address.name)
-            dataRow.createCell(7).setCellValue(order.address.address1)
-            dataRow.createCell(8).setCellValue(order.address.address2)
-            dataRow.createCell(9).setCellValue(order.address.city)
-            dataRow.createCell(10).setCellValue(order.address.state)
-            dataRow.createCell(11).setCellValue(order.address.mobileNo)
-            dataRow.createCell(12).setCellValue(order.address.pincode)
-            dataRow.createCell(13).setCellValue(order.address.paymentType)
-            dataRow.createCell(14).setCellValue(order.address.paymentAmount)
+            dataRow.createCell(7).setCellValue(order.address.name)
+            dataRow.createCell(8).setCellValue(order.address.address1)
+            dataRow.createCell(9).setCellValue(order.address.address2)
+            dataRow.createCell(10).setCellValue(order.address.city)
+            dataRow.createCell(11).setCellValue(order.address.state)
+            dataRow.createCell(12).setCellValue(order.address.mobileNo)
+            dataRow.createCell(13).setCellValue(order.address.pincode)
+            dataRow.createCell(14).setCellValue(order.address.paymentType)
+            dataRow.createCell(15).setCellValue(order.address.paymentAmount)
         }
     }
 

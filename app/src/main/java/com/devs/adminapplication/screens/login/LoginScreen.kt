@@ -33,6 +33,7 @@ import com.devs.adminapplication.navigation.AdminScreens
 import com.devs.adminapplication.navigation.Graph
 import com.devs.adminapplication.ui.theme.PrimaryDark
 import com.devs.adminapplication.screens.login.LoginViewModel
+import com.devs.adminapplication.utils.MyPreference
 
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -43,13 +44,13 @@ fun LoginScreen(
     viewModel: LoginViewModel,
 
     ) {
-
+    val preference= MyPreference(context = LocalContext.current)
     //ui
     var email by remember {
-        mutableStateOf("amit10")
+        mutableStateOf(preference.getUserId())
     }
     var password by remember {
-        mutableStateOf("test123")
+        mutableStateOf(preference.getPass())
     }
     var passwordVisibility by remember {
         mutableStateOf(true)
