@@ -4,7 +4,7 @@ plugins {
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
 }
-
+def appVersionName = "1.01"
 android {
     namespace 'com.devs.adminapplication'
     compileSdk 33
@@ -13,8 +13,8 @@ android {
         applicationId "com.devs.adminapplication"
         minSdk 26
         targetSdk 33
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName appVersionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -24,8 +24,13 @@ android {
 
     buildTypes {
         release {
+            archivesBaseName = "Admin App $appVersionName"
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            // ...
+            archivesBaseName = "Admin App $appVersionName"
         }
     }
     compileOptions {

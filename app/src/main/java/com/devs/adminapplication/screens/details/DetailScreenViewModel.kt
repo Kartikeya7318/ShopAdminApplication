@@ -100,7 +100,7 @@ class DetailScreenViewModel @Inject constructor(
         }
     }
 
-    fun updateProductImg(prodid: Int, imgid: Int, img: File){
+    fun updateProductImg(prodid: Int, imgid: Int, img: File,onSuccess: ()->Unit){
         _loading.value=true
         val fileRequestBody = img.asRequestBody("image/*".toMediaTypeOrNull())
         val filePart =
@@ -117,6 +117,7 @@ class DetailScreenViewModel @Inject constructor(
                     //TODO
                     _failReason.value = "Updated"
                     _loading.value=false
+                    onSuccess()
 
                 }
             }catch (ex: Exception) {

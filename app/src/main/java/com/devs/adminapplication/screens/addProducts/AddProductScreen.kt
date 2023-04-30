@@ -143,7 +143,7 @@ fun AddProductScreen(
                         AsyncImage(
                             model = selectedImageUris[index],
                             contentDescription = null,
-                            modifier = Modifier.height(200.dp),
+                            modifier = Modifier.height(400.dp),
                             contentScale = ContentScale.Crop
                         )
                     }

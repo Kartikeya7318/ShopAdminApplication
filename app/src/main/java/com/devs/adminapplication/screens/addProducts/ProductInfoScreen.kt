@@ -81,7 +81,7 @@ fun ProductInfoScreen(
                 CircularProgressIndicator(color = PrimaryDark)
             }
         if (failReason.value != " ") {
-            Toast.makeText(context, addProductViewModel.failReason.value, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, failReason.value, Toast.LENGTH_SHORT).show()
         }
         Button(
             modifier = Modifier

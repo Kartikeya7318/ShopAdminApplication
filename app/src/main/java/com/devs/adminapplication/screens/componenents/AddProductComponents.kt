@@ -38,7 +38,7 @@ fun TextBox(
     focusManager: FocusManager,
     enabled: Boolean = true,
     isError: MutableState<Boolean> = mutableStateOf(false),
-    regex: Regex= Regex("^[a-zA-Z0-9 ]+$")
+    regex: Regex= Regex("^[a-zA-Z0-9 ']+$")
 ) {
     OutlinedTextField(
         value = name.value,

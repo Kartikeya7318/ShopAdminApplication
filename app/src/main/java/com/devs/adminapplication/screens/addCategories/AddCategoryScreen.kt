@@ -7,6 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -24,6 +25,7 @@ import com.devs.adminapplication.models.util.ChipList
 import com.devs.adminapplication.screens.addSubCategories.SubCategoryViewModel
 import com.devs.adminapplication.screens.componenents.TextBox
 import com.devs.adminapplication.screens.componenents.TextBoxSelectable
+import com.devs.adminapplication.ui.theme.PrimaryDark
 import com.devs.adminapplication.ui.theme.PrimaryLight
 import com.devs.adminapplication.ui.theme.PrimaryText
 import com.devs.adminapplication.utils.Constants
@@ -31,6 +33,9 @@ import com.devs.adminapplication.utils.Constants
 @Composable
 fun AddCategoryScreen(categoryViewModel: AddCategoryViewModel) {
 //    Text(text = "CategoryScreen")
+    val context= LocalContext.current
+    val loading = categoryViewModel.loading.collectAsState()
+    val failReason = categoryViewModel.failReason.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -94,7 +99,14 @@ fun AddCategoryScreen(categoryViewModel: AddCategoryViewModel) {
             "Add" -> AddBox(categoryViewModel = categoryViewModel)
             "Delete" -> DeleteBox(categoryViewModel = categoryViewModel)
         }
-
+        if (loading.value == true)
+            Column(modifier = Modifier.fillMaxWidth().padding(top = 20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                CircularProgressIndicator(color = PrimaryDark)
+            }
+        if (failReason.value != " ") {
+            Toast.makeText(context, failReason.value, Toast.LENGTH_SHORT).show()
+            categoryViewModel.resetFailReason()
+        }
     }
 }
 
@@ -117,6 +129,7 @@ private fun EditBox(categoryViewModel: AddCategoryViewModel) {
     val focusManager = LocalFocusManager.current
     val categoryName = remember { mutableStateOf("") }
     val categoryId = remember { mutableStateOf("") }
+    val newCategoryName = remember { mutableStateOf(categoryName.value) }
     TextBoxSelectable(
         categoryName,
         "Category",
@@ -125,10 +138,11 @@ private fun EditBox(categoryViewModel: AddCategoryViewModel) {
         catList,
     ) { id ->
         categoryId.value = id
+        newCategoryName.value = categoryName.value
     }
     if (categoryId.value != ""){
-        val newCategoryName = remember { mutableStateOf(categoryName.value) }
-        newCategoryName.value = categoryName.value
+
+
         Row(modifier = Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
             Column(
                 modifier = Modifier.fillMaxWidth(0.5f),

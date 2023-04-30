@@ -94,7 +94,8 @@ class HomeViewModel @Inject constructor(
             categories.data?.let { finalList.addAll(it.categories) }
             categories.data?.categories = finalList
             _homeScreenState.value = _homeScreenState.value.copy(
-                categories = categories.data!!.categories
+                categories = categories.data!!.categories,
+                productListCategory = categories.data!!.categories[0].id.toString()
             )
             getAllSubCategories()
         }

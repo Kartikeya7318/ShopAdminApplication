@@ -1,10 +1,12 @@
 package com.devs.adminapplication.screens.addBrands
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -19,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.devs.adminapplication.models.util.ChipList
 import com.devs.adminapplication.screens.componenents.TextBox
 import com.devs.adminapplication.screens.componenents.TextBoxSelectable
+import com.devs.adminapplication.ui.theme.PrimaryDark
 
 import com.devs.adminapplication.ui.theme.PrimaryLight
 import com.devs.adminapplication.ui.theme.PrimaryText
@@ -26,6 +29,9 @@ import com.devs.adminapplication.utils.Constants
 
 @Composable
 fun AddBrandScreen(addBrandViewModel: AddBrandViewModel) {
+    val context= LocalContext.current
+    val loading = addBrandViewModel.loading.collectAsState()
+    val failReason = addBrandViewModel.failReason.collectAsState()
 //    Text(text = "BrandScreen")
     Column(
         modifier = Modifier
@@ -90,6 +96,14 @@ fun AddBrandScreen(addBrandViewModel: AddBrandViewModel) {
             "Add" -> AddBox(brandViewModel = addBrandViewModel)
             "Delete" -> DeleteBox(brandViewModel = addBrandViewModel)
         }
+        if (loading.value == true)
+            Column(modifier = Modifier.fillMaxWidth().padding(top = 20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                CircularProgressIndicator(color = PrimaryDark)
+            }
+        if (failReason.value != " ") {
+            Toast.makeText(context, failReason.value, Toast.LENGTH_SHORT).show()
+            addBrandViewModel.resetFailReason()
+        }
 
     }
 
@@ -100,6 +114,7 @@ private fun EditBox(brandViewModel: AddBrandViewModel) {
     val context = LocalContext.current
     val brandScreenState by brandViewModel.addBrandState.collectAsState()
     val brandList: MutableList<ChipList> = mutableListOf()
+
     for (i in 0 until (brandScreenState.brands.size)) {
         val chipList = ChipList(
             id = brandScreenState.brands[i].id.toString(),
@@ -112,6 +127,7 @@ private fun EditBox(brandViewModel: AddBrandViewModel) {
     val focusManager = LocalFocusManager.current
     val brandName = remember { mutableStateOf("") }
     val brandId = remember { mutableStateOf("") }
+    val newBrandName = remember { mutableStateOf(brandName.value) }
     TextBoxSelectable(
         brandName,
         "Brand",
@@ -120,17 +136,17 @@ private fun EditBox(brandViewModel: AddBrandViewModel) {
         brandList,
     ) { id ->
         brandId.value = id
+        newBrandName.value=brandName.value
     }
     if (brandId.value != ""){
-        val newBrandName = remember { mutableStateOf(brandName.value) }
-        newBrandName.value = brandName.value
+//        newBrandName.value = brandName.value
         Row(modifier = Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
             Column(
                 modifier = Modifier.fillMaxWidth(0.5f),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 androidx.compose.material3.Text(text = "Old Data", fontSize = 16.sp)
-                TextBox(brandName, "Category Name", focusManager, enabled = false)
+                TextBox(brandName, "Brand Name", focusManager, enabled = false)
 
             }
             Spacer(modifier = Modifier.size(10.dp))
@@ -139,7 +155,7 @@ private fun EditBox(brandViewModel: AddBrandViewModel) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 androidx.compose.material3.Text(text = "New Data", fontSize = 16.sp)
-                TextBox(newBrandName, "Category Name", focusManager, enabled = true)
+                TextBox(newBrandName, "Brand Name", focusManager, enabled = true)
             }
         }
         Button(

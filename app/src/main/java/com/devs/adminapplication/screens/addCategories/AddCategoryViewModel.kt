@@ -51,6 +51,7 @@ class AddCategoryViewModel @Inject constructor(
     }
 
     fun newCat(categoryName:String){
+        _loading.value=true
         Log.d("okhttp", "newCat: $categoryName")
         viewModelScope.launch {
             try {
@@ -59,10 +60,12 @@ class AddCategoryViewModel @Inject constructor(
                     name = categoryName
                 )
                 if (response.code()==200){
-                    //TODO
+                    _loading.value=false
+                    _failReason.value="Success"
                 }
             }catch (ex: Exception) {
-                //TODO
+                _loading.value=false
+                _failReason.value=ex.message.toString()
                 Log.d("LoginFlow", "failreason: " +ex.message.toString() )
             }
 
@@ -70,6 +73,7 @@ class AddCategoryViewModel @Inject constructor(
     }
 
     fun deleteSubCat(id: Int){
+        _loading.value=true
         viewModelScope.launch {
             try {
                 val response=api.deleteCat(
@@ -77,10 +81,12 @@ class AddCategoryViewModel @Inject constructor(
                     id
                 )
                 if (response.code()==200){
-                    //TODO
+                    _loading.value=false
+                    _failReason.value="Success"
                 }
             }catch (ex: Exception) {
-                //TODO
+                _loading.value=false
+                _failReason.value=ex.message.toString()
                 Log.d("LoginFlow", "failreason: " +ex.message.toString() )
             }
 
@@ -88,6 +94,7 @@ class AddCategoryViewModel @Inject constructor(
     }
 
     fun updateCat(name: String,id: Int){
+        _loading.value=true
         viewModelScope.launch {
             try {
                 val response=api.editCat(
@@ -96,14 +103,19 @@ class AddCategoryViewModel @Inject constructor(
                     name = name
                 )
                 if (response.code()==200){
-                    //TODO
+                    _loading.value=false
+                    _failReason.value="Success"
                 }
             }catch (ex: Exception) {
-                //TODO
+                _loading.value=false
+                _failReason.value=ex.message.toString()
                 Log.d("LoginFlow", "failreason: " +ex.message.toString() )
             }
 
         }
+    }
+    fun resetFailReason() {
+        _failReason.value = " "
     }
 
 }

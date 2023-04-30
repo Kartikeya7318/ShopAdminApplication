@@ -196,10 +196,10 @@ fun DetailsScreen(
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                            horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = "Image Number : "+imageIndex)
+//                            Text(text = "Image Number : "+imageIndex)
                             if (imageSaveEnabled) {
                                 IconButton(onClick = {
                                     imageSaveEnabled = false
@@ -290,11 +290,14 @@ fun DetailsScreen(
                 }
 
                 if (loading.value == true)
-                    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         CircularProgressIndicator(color = PrimaryDark)
                     }
                 if (failReason.value != " ") {
-                    Toast.makeText(context,failReason.value, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, failReason.value, Toast.LENGTH_SHORT).show()
                     detailScreenViewModel.resetFailReason()
                 }
 
@@ -505,7 +508,7 @@ fun DetailsScreen(
                             Text(text = "Save Image Changes?")
                         },
                         text = {
-                            Text("Image ${imageIndex+1} of the product will be updated")
+                            Text("Image ${imageIndex + 1} of the product will be updated")
                         },
                         confirmButton = {
                             Button(
@@ -517,7 +520,10 @@ fun DetailsScreen(
                                         prodid = id.value.toInt(),
                                         imgid = product.productImg[imageIndex].id,
                                         imgFile
-                                    )
+                                    ) {
+                                        product.productImg[imageIndex].url= selectedImageUri.toString()
+                                        selectedImageUri=null
+                                    }
 //                                    detailScreenViewModel.updateProductOnServer(update, product.id)
 
                                 }) {
@@ -864,7 +870,6 @@ fun DetailBar(
 
 
         }
-
 
     }
 }

@@ -43,7 +43,7 @@ class SubCategoryViewModel @Inject constructor(
     val loading: StateFlow<Boolean> = _loading
     private val _failReason = MutableStateFlow(" ")
     val failReason: StateFlow<String> = _failReason
-    private val _subCategoryScreenState= MutableStateFlow(DetailScreenState())
+    private val _subCategoryScreenState= MutableStateFlow(SubCategoryScreenState())
     val subCategoryScreenState get() = _subCategoryScreenState.asStateFlow()
     fun getAllCategories() {
         Log.d("reload flow", "getAllCategories: ")
@@ -67,6 +67,7 @@ class SubCategoryViewModel @Inject constructor(
         }
     }
     fun updateSubCat(subCategory:NewSubCategory,id: Int){
+        _loading.value=true
 //        val fileRequestBody = img.asRequestBody("image/*".toMediaTypeOrNull())
 //        val filePart =
 //            MultipartBody.Part.createFormData("file", img.name, fileRequestBody)
@@ -79,16 +80,19 @@ class SubCategoryViewModel @Inject constructor(
                     id=id
                 )
                 if (response.code()==200){
-                    //TODO
+                    _loading.value=false
+                    _failReason.value="Success"
                 }
             }catch (ex: Exception) {
-                //TODO
+                _loading.value=false
+                _failReason.value=ex.message.toString()
                 Log.d("LoginFlow", "failreason: " +ex.message.toString() )
             }
 
         }
     }
     fun newSubCat(newSubCat: NewSubCategory,img: File){
+        _loading.value=true
         val fileRequestBody = img.asRequestBody("image/*".toMediaTypeOrNull())
         val filePart =
             MultipartBody.Part.createFormData("file", img.name, fileRequestBody)
@@ -101,16 +105,19 @@ class SubCategoryViewModel @Inject constructor(
                     requestBody = requestBody
                 )
                 if (response.code() == 200) {
-                    //TODO
+                    _loading.value=false
+                    _failReason.value="Success"
                 }
             } catch (ex: Exception) {
-                //TODO
+                _loading.value=false
+                _failReason.value=ex.message.toString()
                 Log.d("LoginFlow", "failreason: " + ex.message.toString())
             }
 
         }
     }
     fun deleteSubCat(id: Int){
+        _loading.value=true
         viewModelScope.launch {
             try {
                 val response=api.deleteSubCat(
@@ -118,10 +125,12 @@ class SubCategoryViewModel @Inject constructor(
                     id
                 )
                 if (response.code()==200){
-                    //TODO
+                    _loading.value=false
+                    _failReason.value="Success"
                 }
             }catch (ex: Exception) {
-                //TODO
+                _loading.value=false
+                _failReason.value=ex.message.toString()
                 Log.d("LoginFlow", "failreason: " +ex.message.toString() )
             }
 
@@ -129,6 +138,7 @@ class SubCategoryViewModel @Inject constructor(
     }
 
     fun updateSubCatImg(id:Int,img: File){
+        _loading.value=true
         val fileRequestBody = img.asRequestBody("image/*".toMediaTypeOrNull())
         val filePart =
             MultipartBody.Part.createFormData("file", img.name, fileRequestBody)
@@ -140,13 +150,18 @@ class SubCategoryViewModel @Inject constructor(
                     id = id
                 )
                 if (response.code()==200){
-                    //TODO
+                    _loading.value=false
+                    _failReason.value="Success"
                 }
             }catch (ex: Exception) {
-                //TODO
+                _loading.value=false
+                _failReason.value=ex.message.toString()
                 Log.d("LoginFlow", "failreason: " +ex.message.toString() )
             }
 
         }
+    }
+    fun resetFailReason() {
+        _failReason.value = " "
     }
 }

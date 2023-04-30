@@ -3,6 +3,7 @@ package com.devs.adminapplication.screens.addBrands
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import coil.compose.AsyncImagePainter
 import com.devs.adminapplication.models.productResponse.Brand
 import com.devs.adminapplication.network.AdminShopApi
 import com.devs.adminapplication.repository.ProductsRepository
@@ -36,6 +37,7 @@ class AddBrandViewModel @Inject constructor(
     val addBrandState get() = _addBrandState.asStateFlow()
 
     fun getAllBrands(){
+//        _loading.value=true
         viewModelScope.launch {
             val brands= repository.getAllBrands(myPreference.getStoredTag())
             Log.d("reload flow", "getAllBrands: "+brands.data)
@@ -43,11 +45,13 @@ class AddBrandViewModel @Inject constructor(
                 _addBrandState.value=_addBrandState.value.copy(
                     brands= brands.data!!.brands
                 )
+                _loading.value=false
             }
         }
     }
 
     fun newBrand(brandName:String){
+        _loading.value=true
         viewModelScope.launch {
             try {
                 val response=api.newBrand(
@@ -55,16 +59,19 @@ class AddBrandViewModel @Inject constructor(
                     name = brandName
                 )
                 if (response.code()==200){
-                    //TODO
+                    _loading.value=false
+                    _failReason.value="Success"
                 }
             }catch (ex: Exception) {
-                //TODO
+                _loading.value=false
+                _failReason.value=ex.message.toString()
                 Log.d("LoginFlow", "failreason: " +ex.message.toString() )
             }
 
         }
     }
     fun deleteBrand(id:Int){
+        _loading.value=true
         viewModelScope.launch {
             try {
                 val response=api.deleteBrand(
@@ -72,17 +79,20 @@ class AddBrandViewModel @Inject constructor(
                     id=id
                 )
                 if (response.code()==200){
-                    //TODO
+                    _loading.value=false
+//                    onSuccess()
+                    _failReason.value="Success"
                 }
             }catch (ex: Exception) {
-                //TODO
+                _loading.value=false
+                _failReason.value=ex.message.toString()
                 Log.d("LoginFlow", "failreason: " +ex.message.toString() )
             }
 
         }
     }
     fun updateBrand(name: String,id: Int){
-
+        _loading.value=true
         viewModelScope.launch {
             try {
                 val response=api.editBrand(
@@ -91,13 +101,20 @@ class AddBrandViewModel @Inject constructor(
                     name = name
                 )
                 if (response.code()==200){
-                    //TODO
+                    _loading.value=false
+//                    onSuccess()
+                    _failReason.value="Success"
+                    _addBrandState.value.copy()
                 }
             }catch (ex: Exception) {
-                //TODO
+                _loading.value=false
+                _failReason.value=ex.message.toString()
                 Log.d("LoginFlow", "failreason: " +ex.message.toString() )
             }
 
         }
+    }
+    fun resetFailReason() {
+        _failReason.value = " "
     }
 }

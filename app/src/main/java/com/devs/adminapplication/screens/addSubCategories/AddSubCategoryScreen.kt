@@ -41,6 +41,7 @@ import com.devs.adminapplication.screens.addProducts.uriToFile
 import com.devs.adminapplication.screens.componenents.TextBox
 import com.devs.adminapplication.screens.componenents.TextBoxSelectable
 import com.devs.adminapplication.screens.home.HomeViewModel
+import com.devs.adminapplication.ui.theme.PrimaryDark
 import com.devs.adminapplication.ui.theme.PrimaryLight
 import com.devs.adminapplication.ui.theme.PrimaryText
 import com.devs.adminapplication.utils.Constants
@@ -51,9 +52,12 @@ import com.devs.adminapplication.utils.Constants
 @Composable
 fun AddSubCategoryScreen(subCategoryViewModel: SubCategoryViewModel) {
 
+    val context = LocalContext.current
+    val loading = subCategoryViewModel.loading.collectAsState()
+    val failReason = subCategoryViewModel.failReason.collectAsState()
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth().fillMaxHeight()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 10.dp), horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -114,6 +118,14 @@ fun AddSubCategoryScreen(subCategoryViewModel: SubCategoryViewModel) {
             "Add" -> AddBox(subCategoryViewModel = subCategoryViewModel)
             "Delete" -> DeleteBox(subCategoryViewModel = subCategoryViewModel)
         }
+        if (loading.value == true)
+            Column(modifier = Modifier.fillMaxWidth().padding(top = 20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                androidx.compose.material.CircularProgressIndicator(color = PrimaryDark)
+            }
+        if (failReason.value != " ") {
+            Toast.makeText(context, failReason.value, Toast.LENGTH_SHORT).show()
+            subCategoryViewModel.resetFailReason()
+        }
 
     }
 
@@ -154,6 +166,9 @@ private fun EditBox(subCategoryViewModel: SubCategoryViewModel) {
     val categoryId = remember { mutableStateOf("") }
     var subCategoryName = remember { mutableStateOf("") }
     var subCategoryId = remember { mutableStateOf("") }
+    val newcategoryId = remember { mutableStateOf(categoryId.value) }
+    var newsubCategoryName = remember { mutableStateOf(subCategoryName.value) }
+    val newCategoryName = remember { mutableStateOf(categoryName.value) }
     TextBoxSelectable(
         categoryName,
         "Category",
@@ -176,14 +191,12 @@ private fun EditBox(subCategoryViewModel: SubCategoryViewModel) {
         isError = error3
     ) { id ->
         subCategoryId.value = id
-    }
-    if (subCategoryId.value != "" && categoryId.value != "") {
-        val newcategoryId = remember { mutableStateOf(categoryId.value) }
-        var newsubCategoryName = remember { mutableStateOf(subCategoryName.value) }
-        val newCategoryName = remember { mutableStateOf(categoryName.value) }
         newCategoryName.value = categoryName.value
         newsubCategoryName.value = subCategoryName.value
         newcategoryId.value = categoryId.value
+    }
+    if (subCategoryId.value != "" && categoryId.value != "") {
+
         Row(modifier = Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
             Column(
                 modifier = Modifier.fillMaxWidth(0.5f),
@@ -224,15 +237,15 @@ private fun EditBox(subCategoryViewModel: SubCategoryViewModel) {
                 containerColor = PrimaryLight
             ),
             onClick = {
-                Toast.makeText(
-                    context,
-                    "category id-> ${newcategoryId.value} \n subCategory name-> ${newsubCategoryName.value} \n SubCategoryId-> ${subCategoryId.value}",
-                    Toast.LENGTH_LONG
-                ).show()
-                Log.d(
-                    "Subcatcheck",
-                    "category id-> ${newcategoryId.value} \\n subCategory name-> ${newsubCategoryName.value} \\n SubCategoryId-> ${subCategoryId.value}"
-                )
+//                Toast.makeText(
+//                    context,
+//                    "category id-> ${newcategoryId.value} \n subCategory name-> ${newsubCategoryName.value} \n SubCategoryId-> ${subCategoryId.value}",
+//                    Toast.LENGTH_LONG
+//                ).show()
+//                Log.d(
+//                    "Subcatcheck",
+//                    "category id-> ${newcategoryId.value} \\n subCategory name-> ${newsubCategoryName.value} \\n SubCategoryId-> ${subCategoryId.value}"
+//                )
                 subCategoryViewModel.updateSubCat(
                     NewSubCategory(
                         categoryId = newcategoryId.value.toInt(),
