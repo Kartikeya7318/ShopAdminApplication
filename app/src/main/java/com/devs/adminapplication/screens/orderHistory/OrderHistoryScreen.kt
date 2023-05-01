@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
@@ -51,7 +52,6 @@ import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
 import com.maxkeppeler.sheets.calendar.models.CalendarSelection
 import com.maxkeppeler.sheets.calendar.models.CalendarStyle
-import java.io.FileNotFoundException
 import java.io.IOException
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -98,14 +98,14 @@ fun OrderHistoryScreen(orderHistoryViewmodel: OrderHistoryViewmodel) {
     var file = File(fileDir, fileName)
 
 
-    if (orderHistoryState.orderHistory.isNotEmpty()) {
+    if (orderHistoryState.orderHistory.isNotEmpty()&&!loading) {
         dataClassToExcel(orderHistoryState.orderHistory, file, openFileLauncher, context, fileDir)
         Toast.makeText(
             context,
-            "Order_History.xlsx saved in documents folder",
+            "Order_History_$formatted.xlsx saved in documents folder",
             Toast.LENGTH_SHORT
         ).show()
-        outputmessage = "Order_History.xlsx saved in documents folder"
+        outputmessage = "Order_History_$formatted.xlsx saved in documents folder"
     } else {
         outputmessage = "No record Available"
     }
@@ -167,22 +167,46 @@ fun OrderHistoryScreen(orderHistoryViewmodel: OrderHistoryViewmodel) {
                 fontSize = 17.sp
             )
         }
-        var open = false
+
         Spacer(modifier = Modifier.size(10.dp))
         if (loading) {
             androidx.compose.material.CircularProgressIndicator(color = PrimaryDark)
         } else {
-            open = true
             if (orderHistoryState.orderHistory.isNotEmpty()) {
                 TableOrderHistory(orderHistory = orderHistoryState.orderHistory)
+                try {
+                    val uri = Uri.fromFile(file)
+                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                        setDataAndType(uri, getMimeType(file.absolutePath))
+                        flags =
+                            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    }
+
+                    val contentUri = getUriForFile(
+                        context,
+                        "com.devs.adminapplication.fileprovider",
+                        file
+                    )
+                    intent.setDataAndType(contentUri, getMimeType(file.absolutePath))
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+                        openFileLauncher.launch(intent)
+
+
+                } catch (e: IOException) {
+//                        setErrorMessage("Error opening file")
+                } catch (e: ActivityNotFoundException) {
+
+                }
             }
         }
         Spacer(modifier = Modifier.size(10.dp))
 
         Text(
             text = outputmessage,
+            textAlign = TextAlign.Center,
             modifier = Modifier.clickable {
-                if (outputmessage.equals("Order_History.xlsx saved in documents folder")) {
+                if (outputmessage.equals("Order_History_$formatted.xlsx saved in documents folder")) {
                     try {
                         val uri = Uri.fromFile(file)
                         val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -317,27 +341,30 @@ fun dataClassToExcel(
     workbook.close()
 
 
-    try {
-        val uri = Uri.fromFile(file)
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, getMimeType(file.absolutePath))
-            flags =
-                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_GRANT_READ_URI_PERMISSION
-        }
-
-        val contentUri = getUriForFile(
-            context,
-            "com.devs.adminapplication.fileprovider",
-            file
-        )
-        intent.setDataAndType(contentUri, getMimeType(file.absolutePath))
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        openFileLauncher.launch(intent)
-    } catch (e: IOException) {
-//                        setErrorMessage("Error opening file")
-    } catch (e: ActivityNotFoundException) {
-
-    }
+//    try {
+//        val uri = Uri.fromFile(file)
+//        val intent = Intent(Intent.ACTION_VIEW).apply {
+//            setDataAndType(uri, getMimeType(file.absolutePath))
+//            flags =
+//                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_GRANT_READ_URI_PERMISSION
+//        }
+//
+//        val contentUri = getUriForFile(
+//            context,
+//            "com.devs.adminapplication.fileprovider",
+//            file
+//        )
+//        intent.setDataAndType(contentUri, getMimeType(file.absolutePath))
+//        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+//
+//            openFileLauncher.launch(intent)
+//
+//
+//    } catch (e: IOException) {
+////                        setErrorMessage("Error opening file")
+//    } catch (e: ActivityNotFoundException) {
+//
+//    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -412,6 +439,7 @@ fun DateBoxSelectable(
 @Composable
 private fun TableOrderHistory(
     orderHistory: List<OrderHistory>,
+
 ) {
 
 
