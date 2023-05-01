@@ -3,13 +3,15 @@ package com.devs.adminapplication.screens.orderHistory
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Environment
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,16 +21,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.ui.platform.LocalContext
 
-import com.devs.adminapplication.utils.Constants
 //import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.json.JSONObject
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.File
 import java.io.FileOutputStream
@@ -45,10 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.core.content.FileProvider.getUriForFile
-import com.devs.adminapplication.models.productResponse.ProductDetail
-import com.devs.adminapplication.models.util.ChipList
 import com.devs.adminapplication.screens.details.cell
-import com.devs.adminapplication.screens.details.inputDialogState
 import com.devs.adminapplication.ui.theme.PrimaryDark
 import com.devs.adminapplication.ui.theme.PrimaryLight
 import com.maxkeppeker.sheets.core.models.base.rememberSheetState
@@ -56,6 +51,7 @@ import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
 import com.maxkeppeler.sheets.calendar.models.CalendarSelection
 import com.maxkeppeler.sheets.calendar.models.CalendarStyle
+import java.io.FileNotFoundException
 import java.io.IOException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -79,10 +75,7 @@ fun OrderHistoryScreen(orderHistoryViewmodel: OrderHistoryViewmodel) {
     var outputmessage by remember {
         mutableStateOf("")
     }
-    val fileName = "Order_History.xlsx"
-    val fileDir =
-        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-    val file = File(fileDir, fileName)
+
     val openFileLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { activityResult ->
@@ -90,18 +83,29 @@ fun OrderHistoryScreen(orderHistoryViewmodel: OrderHistoryViewmodel) {
             // Handle success
         }
     }
-    file.setReadable(true, false)
-    file.setWritable(true, false)
-    file.setExecutable(true, false)
+    var code = 1
+    val fileName = "Order_History.xlsx"
+    val fileDir =
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS + "/StockAdminFolder")
+    val folderPath = "/storage/emulated/0/Documents/StockAdminFolder"
+    var folder = File(folderPath)
+    if (!folder.exists()) {
+        folder.mkdirs()
+    }
+    var file = File(fileDir, fileName)
+//    while (file.exists()){
+//        file=File(fileDir, "Order_History$code.xlsx")
+//        code++
+//    }
+
     if (orderHistoryState.orderHistory.isNotEmpty()) {
-        dataClassToExcel(orderHistoryState.orderHistory, file.absolutePath)
-        Log.d("json2xls", "Path: " + file.absolutePath)
+        dataClassToExcel(orderHistoryState.orderHistory, file, openFileLauncher, context, fileDir)
         Toast.makeText(
             context,
-            "Order_History.xlsx downloaded",
+            "Order_History.xlsx saved in documents folder",
             Toast.LENGTH_SHORT
         ).show()
-        outputmessage = "Order_History.xlsx downloaded"
+        outputmessage = "Order_History.xlsx saved in documents folder"
     } else {
         outputmessage = "No record Available"
     }
@@ -163,38 +167,14 @@ fun OrderHistoryScreen(orderHistoryViewmodel: OrderHistoryViewmodel) {
                 fontSize = 17.sp
             )
         }
-        var open=false
+        var open = false
         Spacer(modifier = Modifier.size(10.dp))
         if (loading) {
             androidx.compose.material.CircularProgressIndicator(color = PrimaryDark)
         } else {
-            open=true
+            open = true
             if (orderHistoryState.orderHistory.isNotEmpty()) {
                 TableOrderHistory(orderHistory = orderHistoryState.orderHistory)
-                try {
-                    val uri = Uri.fromFile(file)
-                    val intent = Intent(Intent.ACTION_VIEW).apply {
-                        setDataAndType(uri, getMimeType(file.absolutePath))
-                        flags =
-                            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    }
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        val contentUri =
-                            getUriForFile(context, "com.devs.adminapplication.fileprovider", file)
-                        intent.setDataAndType(contentUri, getMimeType(file.absolutePath))
-                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    }
-                    if (open){
-                        open=false
-                        openFileLauncher.launch(intent)
-                    }
-
-                } catch (e: IOException) {
-//                        setErrorMessage("Error opening file")
-                } catch (e: ActivityNotFoundException) {
-
-                }
             }
         }
         Spacer(modifier = Modifier.size(10.dp))
@@ -202,7 +182,7 @@ fun OrderHistoryScreen(orderHistoryViewmodel: OrderHistoryViewmodel) {
         Text(
             text = outputmessage,
             modifier = Modifier.clickable {
-                if (outputmessage.equals("Order_History.xlsx downloaded")) {
+                if (outputmessage.equals("Order_History.xlsx saved in documents folder")) {
                     try {
                         val uri = Uri.fromFile(file)
                         val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -211,15 +191,13 @@ fun OrderHistoryScreen(orderHistoryViewmodel: OrderHistoryViewmodel) {
                                 Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_GRANT_READ_URI_PERMISSION
                         }
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            val contentUri = getUriForFile(
-                                context,
-                                "com.devs.adminapplication.fileprovider",
-                                file
-                            )
-                            intent.setDataAndType(contentUri, getMimeType(file.absolutePath))
-                            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                        }
+                        val contentUri = getUriForFile(
+                            context,
+                            "com.devs.adminapplication.fileprovider",
+                            file
+                        )
+                        intent.setDataAndType(contentUri, getMimeType(file.absolutePath))
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                         openFileLauncher.launch(intent)
                     } catch (e: IOException) {
 //                        setErrorMessage("Error opening file")
@@ -255,7 +233,7 @@ data class OrderHistory(
     val size: String,
     val quantity: Int,
     val address: Address,
-    val productName :String
+    val productName: String
 )
 
 data class Address(
@@ -277,30 +255,15 @@ data class OrderHistoryResponse(
     val orderHistory: List<OrderHistory>
 )
 
-//fun parseJson(jsonData: String): OrderHistoryResponse {
-//    val jsonObject = JSONObject(jsonData)
-//    val orderHistoryArray = jsonObject.getJSONArray("orderHistory")
-//    val orderHistory = mutableListOf<OrderHistory>()
-//    for (i in 0 until orderHistoryArray.length()) {
-//        val orderObject = orderHistoryArray.getJSONObject(i)
-//        val order = OrderHistory(
-//            orderObject.getInt("orderId"),
-//            orderObject.getString("userId"),
-//            orderObject.getDouble("totalAmount"),
-//            orderObject.getString("color"),
-//            orderObject.getString("size"),
-//            orderObject.getInt("quantity")
-//        )
-//        orderHistory.add(order)
-//    }
-//    return OrderHistoryResponse(
-//        jsonObject.getString("errorCode"),
-//        jsonObject.getString("errorMessage"),
-//        orderHistory
-//    )
-//}
 
-fun dataClassToExcel(orderHistoryList: List<OrderHistory>, fileName: String) {
+fun dataClassToExcel(
+    orderHistoryList: List<OrderHistory>,
+    file: File,
+    openFileLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>,
+    context: Context,
+    fileDir: File
+) {
+
     val workbook = XSSFWorkbook()
     val sheet = workbook.createSheet("Order History")
 
@@ -348,10 +311,33 @@ fun dataClassToExcel(orderHistoryList: List<OrderHistory>, fileName: String) {
     }
 
     // Write the workbook to an Excel file
-    val fileOut = FileOutputStream(fileName)
+    val fileOut = FileOutputStream(file.absolutePath)
     workbook.write(fileOut)
     fileOut.close()
     workbook.close()
+
+
+    try {
+        val uri = Uri.fromFile(file)
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, getMimeType(file.absolutePath))
+            flags =
+                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_GRANT_READ_URI_PERMISSION
+        }
+
+        val contentUri = getUriForFile(
+            context,
+            "com.devs.adminapplication.fileprovider",
+            file
+        )
+        intent.setDataAndType(contentUri, getMimeType(file.absolutePath))
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        openFileLauncher.launch(intent)
+    } catch (e: IOException) {
+//                        setErrorMessage("Error opening file")
+    } catch (e: ActivityNotFoundException) {
+
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
