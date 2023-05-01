@@ -54,6 +54,7 @@ import com.maxkeppeler.sheets.calendar.models.CalendarStyle
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -83,8 +84,10 @@ fun OrderHistoryScreen(orderHistoryViewmodel: OrderHistoryViewmodel) {
             // Handle success
         }
     }
-    var code = 1
-    val fileName = "Order_History.xlsx"
+    val currentDateTime = LocalDateTime.now()
+    val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy_HH-mm-ss")
+    val formatted = currentDateTime.format(formatter)
+    val fileName = "Order_History_$formatted.xlsx"
     val fileDir =
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS + "/StockAdminFolder")
     val folderPath = "/storage/emulated/0/Documents/StockAdminFolder"
@@ -93,10 +96,7 @@ fun OrderHistoryScreen(orderHistoryViewmodel: OrderHistoryViewmodel) {
         folder.mkdirs()
     }
     var file = File(fileDir, fileName)
-//    while (file.exists()){
-//        file=File(fileDir, "Order_History$code.xlsx")
-//        code++
-//    }
+
 
     if (orderHistoryState.orderHistory.isNotEmpty()) {
         dataClassToExcel(orderHistoryState.orderHistory, file, openFileLauncher, context, fileDir)

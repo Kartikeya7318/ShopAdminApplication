@@ -4,7 +4,7 @@ plugins {
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
 }
-def appVersionName = "1.02"
+def appVersionName = "1.03"
 android {
     namespace 'com.devs.adminapplication'
     compileSdk 33
@@ -13,7 +13,7 @@ android {
         applicationId "com.devs.adminapplication"
         minSdk 26
         targetSdk 33
-        versionCode 3
+        versionCode 4
         versionName appVersionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
