@@ -5,7 +5,7 @@ import com.devs.adminapplication.models.util.ChipList
 object Constants {
     const val BASE_URL = "http://103.160.145.42/stockmanagement/api/"      //production ip
 //    const val BASE_URL = "http://192.168.29.74:8080/stockmanagement/api/" //home wifi ip
-//    const val BASE_URL = "http://192.168.134.13:8080/stockmanagement/api/" //mobile hotspot ip
+//    const val BASE_URL = "http://192.168.124.13:8080/stockmanagement/api/" //mobile hotspot ip
 //    const val BASE_URL = "http://10.10.51.61:8080/stockmanagement/api/" //college ip
 
     const val ADD_PRODUCT_URL = "product"

@@ -118,4 +118,7 @@ dependencies {
     //imageslider
     implementation 'com.google.accompanist:accompanist-pager:0.22.0-rc'
 
+    //status bar
+    implementation "com.google.accompanist:accompanist-systemuicontroller:0.31.3-beta"
+
 }

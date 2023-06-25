@@ -14,6 +14,7 @@ import com.devs.adminapplication.screens.details.DetailScreenViewModel
 import com.devs.adminapplication.screens.details.DetailsScreen
 import com.devs.adminapplication.screens.home.HomeViewModel
 
+
 @Composable
 fun RootNavigationGraph(navController1: NavHostController) {
     NavHost(
@@ -23,7 +24,9 @@ fun RootNavigationGraph(navController1: NavHostController) {
     ) {
         authNavGraph(navController1 = navController1)
         composable(route = Graph.HOME.name) {
-            MainActivityScreen(navControllerRoot=navController1)
+            val mainViewModel= hiltViewModel<HomeViewModel>()
+
+            MainActivityScreen(navControllerRoot=navController1, viewModel = mainViewModel)
         }
         composable(AdminScreens.DetailsScreen.name + "/{id}"+"/{subId}",
             arguments = listOf(navArgument(name = "id") { type = NavType.StringType },

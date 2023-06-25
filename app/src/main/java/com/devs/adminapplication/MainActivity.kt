@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -22,6 +23,8 @@ import com.devs.adminapplication.screens.MainActivityScreen
 import com.devs.adminapplication.screens.navigationDrawer.Menu
 import com.devs.adminapplication.utils.Constants
 import com.devs.adminapplication.ui.theme.AdminApplicationTheme
+import com.devs.adminapplication.ui.theme.PrimaryLight
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -36,19 +39,14 @@ class MainActivity : ComponentActivity() {
         var prefs=PreferenceManager.getDefaultSharedPreferences(this)
         var token:String?=null
         super.onCreate(savedInstanceState)
-//        // Check if the permission has already been granted
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.)
-//            != PackageManager.PERMISSION_GRANTED) {
-//            // Permission is not granted, request it
-//            ActivityCompat.requestPermissions(this,
-//                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-//                MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE)
-//        } else {
-//            // Permission already granted, do your work
-//        }
+
 
         setContent {
             AdminApplicationTheme {
+                val systemUiController = rememberSystemUiController()
+                systemUiController.setSystemBarsColor(
+                    color = PrimaryLight
+                )
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),

@@ -17,13 +17,14 @@ import com.devs.adminapplication.screens.addSubCategories.AddSubCategoryScreen
 import com.devs.adminapplication.screens.addSubCategories.SubCategoryViewModel
 import com.devs.adminapplication.screens.home.HomeScreen
 import com.devs.adminapplication.screens.home.HomeViewModel
+
 import com.devs.adminapplication.screens.orderHistory.OrderHistoryScreen
 import com.devs.adminapplication.screens.orderHistory.OrderHistoryViewmodel
 
 @Composable
-fun HomeNavGraph(navController2: NavHostController, navControllerRoot: NavHostController) {
+fun HomeNavGraph(navController2: NavHostController, navControllerRoot: NavHostController,homeViewModel: HomeViewModel) {
     val addProductViewModel = hiltViewModel<AddProductViewModel>()
-    val homeViewModel = hiltViewModel<HomeViewModel>()
+//    val homeViewModel = hiltViewModel<HomeViewModel>()
     NavHost(
         navController = navController2,
         route = Graph.HOME.name,
