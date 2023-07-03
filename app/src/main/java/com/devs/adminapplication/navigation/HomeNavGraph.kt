@@ -1,6 +1,10 @@
 package com.devs.adminapplication.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -24,14 +28,13 @@ import com.devs.adminapplication.screens.orderHistory.OrderHistoryViewmodel
 @Composable
 fun HomeNavGraph(navController2: NavHostController, navControllerRoot: NavHostController,homeViewModel: HomeViewModel) {
     val addProductViewModel = hiltViewModel<AddProductViewModel>()
-//    val homeViewModel = hiltViewModel<HomeViewModel>()
     NavHost(
         navController = navController2,
         route = Graph.HOME.name,
         startDestination = AdminScreens.HomeScreen.name
     ) {
         composable(AdminScreens.HomeScreen.name) {
-            homeViewModel.getAllCategories()
+            Log.d("Efficiency Check", "composabel home screen ")
             HomeScreen(navController = navControllerRoot, homeViewModel)
         }
         composable(AdminScreens.AddProductScreen.name) {

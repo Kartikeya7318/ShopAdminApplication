@@ -16,7 +16,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -44,9 +47,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.core.content.FileProvider.getUriForFile
+
 import com.devs.adminapplication.screens.details.cell
 import com.devs.adminapplication.ui.theme.PrimaryDark
 import com.devs.adminapplication.ui.theme.PrimaryLight
+import com.devs.adminapplication.ui.theme.PrimaryText
 import com.maxkeppeker.sheets.core.models.base.rememberSheetState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
@@ -63,27 +68,12 @@ import java.util.*
 @Composable
 fun OrderHistoryScreen(orderHistoryViewmodel: OrderHistoryViewmodel) {
     val orderHistoryState by orderHistoryViewmodel.orderHistoryState.collectAsState()
-    val loading by orderHistoryViewmodel.loading.collectAsState();
+    val loading by orderHistoryViewmodel.loading.collectAsState()
     val context = LocalContext.current
-    val date1text = remember { mutableStateOf("") }
-    val date2text = remember { mutableStateOf("") }
-    var date1 by remember {
-        mutableStateOf(LocalDate.now())
-    }
-    var date2 by remember {
-        mutableStateOf(LocalDate.now())
-    }
     var outputmessage by remember {
         mutableStateOf("")
     }
 
-    val openFileLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { activityResult ->
-        if (activityResult.resultCode == RESULT_OK) {
-            // Handle success
-        }
-    }
     val currentDateTime = LocalDateTime.now()
     val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy_HH-mm-ss")
     val formatted = currentDateTime.format(formatter)
@@ -98,8 +88,8 @@ fun OrderHistoryScreen(orderHistoryViewmodel: OrderHistoryViewmodel) {
     var file = File(fileDir, fileName)
 
 
-    if (orderHistoryState.orderHistory.isNotEmpty()&&!loading) {
-        dataClassToExcel(orderHistoryState.orderHistory, file, openFileLauncher, context, fileDir)
+    if (orderHistoryState.orderHistory.isNotEmpty() && !loading) {
+        dataClassToExcel(orderHistoryState.orderHistory, file)
         Toast.makeText(
             context,
             "Order_History_$formatted.xlsx saved in documents folder",
@@ -113,67 +103,181 @@ fun OrderHistoryScreen(orderHistoryViewmodel: OrderHistoryViewmodel) {
         modifier = Modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 10.dp, vertical = 10.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(horizontal = 10.dp, vertical = 0.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        DateBoxSelectable(dateText = date1text, label = "From Date") {
-            date1 = it
+        var selected by remember {
+            mutableStateOf("Today")
         }
-        DateBoxSelectable(dateText = date2text, label = "To Date") {
-            date2 = it
+        Spacer(modifier = Modifier.size(10.dp))
+        val buttonList = listOf<String>("Today", "Date", "Name", "Status")
+        LazyRow(
+            Modifier
+                .padding(horizontal = 0.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            contentPadding = PaddingValues(horizontal = 10.dp)
+        ) {
+            items(buttonList) { item: String ->
+                Button(
+                    modifier = Modifier.width(100.dp),
+                    shape = RoundedCornerShape(corner = CornerSize(10.dp)),
+                    onClick = { selected = item },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (selected == item) PrimaryLight else Color.White,
+                        contentColor = PrimaryText
+                    ),
+                    elevation = ButtonDefaults.buttonElevation(4.dp)
+                ) {
+                    androidx.compose.material3.Text(text = item)
+                }
+            }
         }
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp)
-                .height(55.dp),
-            shape = RoundedCornerShape(4.dp),
-            enabled = true,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = PrimaryLight
-            ),
-            onClick = {
-                Log.d(
-                    "json2xls",
-                    "OrderHistoryScreen: ${date1text.value} $date1 ${date2text.value} $date2"
-                )
-                if (date1 != null && date2 != null) {
-                    val res = date1!!.compareTo(date2)
-                    if (res < 0) {
-                        orderHistoryViewmodel.getOrderHistory(date1text.value, date2text.value)
+        Spacer(modifier = Modifier.size(10.dp))
+//
+        when (selected) {
+            "Date" -> dateReport(
+                orderHistoryViewmodel, context, outputmessage,
+                orderHistoryState, file, formatted, loading
+            )
+            "Today" -> todayReport(
+                orderHistoryViewmodel, context, outputmessage,
+                orderHistoryState, file, formatted, loading
+            )
+            "Name" -> nameReport(
+                orderHistoryViewmodel, context, outputmessage,
+                orderHistoryState, file, formatted, loading
+            )
+            "Status" -> statusReport(
+                orderHistoryViewmodel, context, outputmessage,
+                orderHistoryState, file, formatted, loading
+            )
 
-                    } else if (res > 0) {
-                        Toast.makeText(context, "To Date is before From Date ", Toast.LENGTH_SHORT)
-                            .show()
-                        outputmessage = "To Date is before From Date "
-                        orderHistoryViewmodel.resetOrderHistory()
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "To Date is equal to From Date ",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        outputmessage = "To Date is equal to From Date "
-                        orderHistoryViewmodel.resetOrderHistory()
-                    }
+        }
+
+    }
+
+}
+
+@Composable
+private fun dateReport(
+    orderHistoryViewmodel: OrderHistoryViewmodel,
+    context: Context,
+    outputmessage: String,
+    orderHistoryState: OrderHistoryState,
+    file: File,
+    formatted: String?,
+    loading: Boolean
+) {
+
+    var outputmessage1 = outputmessage
+    val date1text = remember { mutableStateOf("") }
+    val date2text = remember { mutableStateOf("") }
+    var date1 by remember {
+        mutableStateOf(LocalDate.now())
+    }
+    var date2 by remember {
+        mutableStateOf(LocalDate.now())
+    }
+
+    val openFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { activityResult ->
+        if (activityResult.resultCode == RESULT_OK) {
+            // Handle success
+        }
+    }
+    DateBoxSelectable(dateText = date1text, label = "From Date") {
+        date1 = it
+    }
+    DateBoxSelectable(dateText = date2text, label = "To Date") {
+        date2 = it
+    }
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 10.dp)
+            .height(55.dp),
+        shape = RoundedCornerShape(4.dp),
+        enabled = true,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = PrimaryLight
+        ),
+        onClick = {
+            Log.d(
+                "json2xls",
+                "OrderHistoryScreen: ${date1text.value} $date1 ${date2text.value} $date2"
+            )
+            if (date1 != null && date2 != null) {
+                val res = date1!!.compareTo(date2)
+                if (res < 0) {
+                    orderHistoryViewmodel.getOrderHistory(date1text.value, date2text.value)
+
+                } else if (res > 0) {
+                    Toast.makeText(context, "To Date is before From Date ", Toast.LENGTH_SHORT)
+                        .show()
+                    outputmessage1 = "To Date is before From Date "
+                    orderHistoryViewmodel.resetOrderHistory()
+                } else {
+                    Toast.makeText(
+                        context,
+                        "To Date is equal to From Date ",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    outputmessage1 = "To Date is equal to From Date "
+                    orderHistoryViewmodel.resetOrderHistory()
+                }
+            }
+
+
+        }
+    ) {
+        Text(
+            text = "Fetch History",
+            color = Color.Black,
+            fontSize = 17.sp
+        )
+    }
+
+    Spacer(modifier = Modifier.size(10.dp))
+    if (loading) {
+        androidx.compose.material.CircularProgressIndicator(color = PrimaryDark)
+    } else {
+        if (orderHistoryState.orderHistory.isNotEmpty()) {
+            TableOrderHistory(orderHistory = orderHistoryState.orderHistory)
+            try {
+                val uri = Uri.fromFile(file)
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(uri, getMimeType(file.absolutePath))
+                    flags =
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_GRANT_READ_URI_PERMISSION
                 }
 
+                val contentUri = getUriForFile(
+                    context,
+                    "com.devs.adminapplication.fileprovider",
+                    file
+                )
+                intent.setDataAndType(contentUri, getMimeType(file.absolutePath))
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+                openFileLauncher.launch(intent)
+
+
+            } catch (e: IOException) {
+//                        setErrorMessage("Error opening file")
+            } catch (e: ActivityNotFoundException) {
 
             }
-        ) {
-            Text(
-                text = "Fetch History",
-                color = Color.Black,
-                fontSize = 17.sp
-            )
         }
+    }
+    Spacer(modifier = Modifier.size(10.dp))
 
-        Spacer(modifier = Modifier.size(10.dp))
-        if (loading) {
-            androidx.compose.material.CircularProgressIndicator(color = PrimaryDark)
-        } else {
-            if (orderHistoryState.orderHistory.isNotEmpty()) {
-                TableOrderHistory(orderHistory = orderHistoryState.orderHistory)
+    Text(
+        text = outputmessage1,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.clickable {
+            if (outputmessage1.equals("Order_History_$formatted.xlsx saved in documents folder")) {
                 try {
                     val uri = Uri.fromFile(file)
                     val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -189,50 +293,55 @@ fun OrderHistoryScreen(orderHistoryViewmodel: OrderHistoryViewmodel) {
                     )
                     intent.setDataAndType(contentUri, getMimeType(file.absolutePath))
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-
-                        openFileLauncher.launch(intent)
-
-
+                    openFileLauncher.launch(intent)
                 } catch (e: IOException) {
 //                        setErrorMessage("Error opening file")
                 } catch (e: ActivityNotFoundException) {
 
                 }
             }
-        }
-        Spacer(modifier = Modifier.size(10.dp))
 
-        Text(
-            text = outputmessage,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.clickable {
-                if (outputmessage.equals("Order_History_$formatted.xlsx saved in documents folder")) {
-                    try {
-                        val uri = Uri.fromFile(file)
-                        val intent = Intent(Intent.ACTION_VIEW).apply {
-                            setDataAndType(uri, getMimeType(file.absolutePath))
-                            flags =
-                                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_GRANT_READ_URI_PERMISSION
-                        }
+        })
 
-                        val contentUri = getUriForFile(
-                            context,
-                            "com.devs.adminapplication.fileprovider",
-                            file
-                        )
-                        intent.setDataAndType(contentUri, getMimeType(file.absolutePath))
-                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                        openFileLauncher.launch(intent)
-                    } catch (e: IOException) {
-//                        setErrorMessage("Error opening file")
-                    } catch (e: ActivityNotFoundException) {
+}
 
-                    }
-                }
+@Composable
+private fun nameReport(
+    orderHistoryViewmodel: OrderHistoryViewmodel,
+    context: Context,
+    outputmessage: String,
+    orderHistoryState: OrderHistoryState,
+    file: File,
+    formatted: String?,
+    loading: Boolean
+) {
 
-            })
+}
 
-    }
+@Composable
+private fun todayReport(
+    orderHistoryViewmodel: OrderHistoryViewmodel,
+    context: Context,
+    outputmessage: String,
+    orderHistoryState: OrderHistoryState,
+    file: File,
+    formatted: String?,
+    loading: Boolean
+) {
+
+}
+
+@Composable
+private fun statusReport(
+    orderHistoryViewmodel: OrderHistoryViewmodel,
+    context: Context,
+    outputmessage: String,
+    orderHistoryState: OrderHistoryState,
+    file: File,
+    formatted: String?,
+    loading: Boolean
+) {
+
 }
 
 fun getMimeType(filePath: String): String {
@@ -283,9 +392,6 @@ data class OrderHistoryResponse(
 fun dataClassToExcel(
     orderHistoryList: List<OrderHistory>,
     file: File,
-    openFileLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>,
-    context: Context,
-    fileDir: File
 ) {
 
     val workbook = XSSFWorkbook()
@@ -440,7 +546,7 @@ fun DateBoxSelectable(
 private fun TableOrderHistory(
     orderHistory: List<OrderHistory>,
 
-) {
+    ) {
 
 
     Column(

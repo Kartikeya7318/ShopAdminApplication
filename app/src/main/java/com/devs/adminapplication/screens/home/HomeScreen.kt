@@ -67,7 +67,14 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel(),
 //    menuViewModel: MenuViewModel = hiltViewModel()
 ) {
+    val effectLaunched = remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        if (!effectLaunched.value) {
+            homeViewModel.getAllCategories()
+            effectLaunched.value = true
+        }
+    }
     val scope = rememberCoroutineScope()
 
     val homeScreenState by homeViewModel.homeScreenState.collectAsState()

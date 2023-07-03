@@ -52,7 +52,7 @@ class HomeViewModel @Inject constructor(
     private var _topBarState = MutableStateFlow(TopBarState())
     val topBarState get() = _topBarState.asStateFlow()
     init {
-        getAllCategories()
+//        getAllCategories()
 //        getAllSubCategories()
 //        getProducts()
 
@@ -131,6 +131,7 @@ class HomeViewModel @Inject constructor(
 
 
     fun getAllCategories() {
+        Log.d("Efficiency Check", "getAllCategories: Called ")
         viewModelScope.launch {
             val categories = repository.getAllCategories(myPreference.getStoredTag())
             val finalList = mutableListOf<Category>()
@@ -162,31 +163,31 @@ class HomeViewModel @Inject constructor(
                 getAllBrands()
                 Log.d("search subcat tags", "getAllSubCategories: temp not empty ${subcategories.data?.categories?.size}")
 
-                if(_topBarState.value.allProducts?.isEmpty() == true) {
-                    for (subcategory in subcategories.data!!.categories) {
-                        getAllProducts(productListSubCategory = subcategory.id.toString()) {
-                            val temp = _topBarState.value.allProducts?.toMutableList()
-                            if (it != null && temp != null) {
-                                temp.addAll(it)
-//                                Log.d("Search tags", "getAllSubCategories: ${_topBarState.value.allProducts!!.size}")
+//                if(_topBarState.value.allProducts?.isEmpty() == true) {
+//                    for (subcategory in subcategories.data!!.categories) {
+//                        getAllProducts(productListSubCategory = subcategory.id.toString()) {
+//                            val temp = _topBarState.value.allProducts?.toMutableList()
+//                            if (it != null && temp != null) {
+//                                temp.addAll(it)
+////                                Log.d("Search tags", "getAllSubCategories: ${_topBarState.value.allProducts!!.size}")
+////                                Log.d("Search tags", "getAllSubCategories: ${it.size}")
 //                                Log.d("Search tags", "getAllSubCategories: ${it.size}")
-                                Log.d("Search tags", "getAllSubCategories: ${it.size}")
-                            }
-                            val subs = _topBarState.value.subCategoriesAdded.toMutableList()
-                            if (!subs.contains(subcategory.id.toString())) {
-                                subs.add(subcategory.id.toString())
-                                _topBarState.value = _topBarState.value.copy(
-                                    allProducts = temp,
-                                    subCategoriesAdded = subs
-                                )
-                                Log.d(
-                                    "Search tags",
-                                    "getAllSubCategories added to topbar: ${_topBarState.value.allProducts!!.size}"
-                                )
-                            }
-                        }
-                    }
-                }
+//                            }
+//                            val subs = _topBarState.value.subCategoriesAdded.toMutableList()
+//                            if (!subs.contains(subcategory.id.toString())) {
+//                                subs.add(subcategory.id.toString())
+//                                _topBarState.value = _topBarState.value.copy(
+//                                    allProducts = temp,
+//                                    subCategoriesAdded = subs
+//                                )
+//                                Log.d(
+//                                    "Search tags",
+//                                    "getAllSubCategories added to topbar: ${_topBarState.value.allProducts!!.size}"
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
 //
 
 //                Log.d("Search tags", "getAllSubCategories: ${_topBarState.value.allProducts}")

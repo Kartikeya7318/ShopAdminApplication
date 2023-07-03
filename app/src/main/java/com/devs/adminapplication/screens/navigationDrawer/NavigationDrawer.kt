@@ -309,10 +309,10 @@ fun Menu(
 //                    launchSingleTop=true
 //                    restoreState=true
                         }
-
+//                        viewModel.getAllCategories()
                     },
                     onSearchClicked = { viewModel.onAction(UserAction.SearchIconClicked) },
-                    selectedScreen=selectedScreen
+                    selectedScreen = selectedScreen
                 ) {
                     scope.launch {
                         scaffoldState.drawerState.open()
@@ -362,16 +362,16 @@ fun AppBar(
                 modifier = Modifier.weight(1f),
 
                 )
-            if (selectedScreen==AdminScreens.HomeScreen.name) {
-                IconButton(onClick = onSearchClicked) {
-                    Icon(
-                        imageVector = Icons.Rounded.Search,
-                        contentDescription = "Done",
-                        modifier = Modifier.size(28.dp),
-                        tint = Color.Black
-                    )
-                }
-            }
+//            if (selectedScreen==AdminScreens.HomeScreen.name) {
+//                IconButton(onClick = onSearchClicked) {
+//                    Icon(
+//                        imageVector = Icons.Rounded.Search,
+//                        contentDescription = "Done",
+//                        modifier = Modifier.size(28.dp),
+//                        tint = Color.Black
+//                    )
+//                }
+//            }
             IconButton(onClick = refreshState) {
                 Icon(
                     imageVector = Icons.Rounded.History,
