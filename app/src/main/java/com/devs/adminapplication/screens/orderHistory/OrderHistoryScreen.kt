@@ -6,6 +6,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.util.Log
 import android.widget.Toast
@@ -13,9 +14,11 @@ import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -40,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -47,7 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.core.content.FileProvider.getUriForFile
-
+import com.devs.adminapplication.screens.componenents.TextBox
 import com.devs.adminapplication.screens.details.cell
 import com.devs.adminapplication.ui.theme.PrimaryDark
 import com.devs.adminapplication.ui.theme.PrimaryLight
@@ -67,13 +71,25 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrderHistoryScreen(orderHistoryViewmodel: OrderHistoryViewmodel) {
+
     val orderHistoryState by orderHistoryViewmodel.orderHistoryState.collectAsState()
-    val loading by orderHistoryViewmodel.loading.collectAsState()
+    var fileSaved = remember {
+        mutableStateOf(false)
+    }
+    val loading by orderHistoryViewmodel.loading.collectAsState();
     val context = LocalContext.current
+
     var outputmessage by remember {
         mutableStateOf("")
     }
 
+    val openFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { activityResult ->
+        if (activityResult.resultCode == RESULT_OK) {
+            // Handle success
+        }
+    }
     val currentDateTime = LocalDateTime.now()
     val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy_HH-mm-ss")
     val formatted = currentDateTime.format(formatter)
@@ -89,88 +105,201 @@ fun OrderHistoryScreen(orderHistoryViewmodel: OrderHistoryViewmodel) {
 
 
     if (orderHistoryState.orderHistory.isNotEmpty() && !loading) {
-        dataClassToExcel(orderHistoryState.orderHistory, file)
-        Toast.makeText(
-            context,
-            "Order_History_$formatted.xlsx saved in documents folder",
-            Toast.LENGTH_SHORT
-        ).show()
-        outputmessage = "Order_History_$formatted.xlsx saved in documents folder"
+        if (!fileSaved.value) {
+            dataClassToExcel(
+                orderHistoryState.orderHistory,
+                file,
+                openFileLauncher,
+                context,
+                fileDir
+            )
+            Toast.makeText(
+                context,
+                "Order_History_$formatted.xlsx saved in documents folder",
+                Toast.LENGTH_SHORT
+            ).show()
+            outputmessage = "Order_History_$formatted.xlsx saved in documents folder"
+            fileSaved.value = true
+        }
     } else {
+        fileSaved.value=false
         outputmessage = "No record Available"
     }
+
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 10.dp, vertical = 0.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+            .padding(horizontal = 10.dp, vertical = 10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        var selected by remember {
-            mutableStateOf("Today")
+        var selected by remember { mutableStateOf("Date") }
+        Row(
+            Modifier
+                .padding(horizontal = 10.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+
+            Button(
+                modifier = Modifier.width(100.dp),
+                shape = RoundedCornerShape(corner = CornerSize(10.dp)),
+                onClick = { selected = "Date" },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (selected == "Date") PrimaryLight else Color.White,
+                    contentColor = PrimaryText
+                ),
+                elevation = ButtonDefaults.buttonElevation(4.dp)
+            ) {
+                Text(text = "Date")
+            }
+            Button(
+                modifier = Modifier.width(100.dp),
+                shape = RoundedCornerShape(corner = CornerSize(10.dp)),
+                onClick = { selected = "Order ID" },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (selected == "Order ID") PrimaryLight else Color.White,
+                    contentColor = PrimaryText
+                ),
+                elevation = ButtonDefaults.buttonElevation(4.dp)
+            ) {
+                Text(text = "Order ID")
+            }
+
+
         }
         Spacer(modifier = Modifier.size(10.dp))
-        val buttonList = listOf<String>("Today", "Date", "Name", "Status")
-        LazyRow(
-            Modifier
-                .padding(horizontal = 0.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(20.dp),
-            contentPadding = PaddingValues(horizontal = 10.dp)
-        ) {
-            items(buttonList) { item: String ->
-                Button(
-                    modifier = Modifier.width(100.dp),
-                    shape = RoundedCornerShape(corner = CornerSize(10.dp)),
-                    onClick = { selected = item },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (selected == item) PrimaryLight else Color.White,
-                        contentColor = PrimaryText
-                    ),
-                    elevation = ButtonDefaults.buttonElevation(4.dp)
-                ) {
-                    androidx.compose.material3.Text(text = item)
+//        EditBox(selected, categoryViewModel)
+        when (selected) {
+            "Date" -> OrderHistoryByDate(fileSaved, orderHistoryViewmodel, context)
+            "Order ID" -> OrderHistoryByOrderId(fileSaved, orderHistoryViewmodel, context)
+
+        }
+
+
+        Spacer(modifier = Modifier.size(10.dp))
+        if (loading) {
+            androidx.compose.material.CircularProgressIndicator(color = PrimaryDark)
+        } else {
+            if (orderHistoryState.orderHistory.isNotEmpty()) {
+//                TableOrderHistory(orderHistory = orderHistoryState.orderHistory)
+                try {
+                    val uri = Uri.fromFile(file)
+                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                        setDataAndType(uri, getMimeType(file.absolutePath))
+                        flags =
+                            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    }
+
+                    val contentUri = getUriForFile(
+                        context,
+                        "com.devs.adminapplication.fileprovider",
+                        file
+                    )
+                    intent.setDataAndType(contentUri, getMimeType(file.absolutePath))
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+//                        openFileLauncher.launch(intent)
+
+
+                } catch (e: IOException) {
+//                        setErrorMessage("Error opening file")
+                } catch (e: ActivityNotFoundException) {
+
                 }
             }
         }
         Spacer(modifier = Modifier.size(10.dp))
-//
-        when (selected) {
-            "Date" -> dateReport(
-                orderHistoryViewmodel, context, outputmessage,
-                orderHistoryState, file, formatted, loading
-            )
-            "Today" -> todayReport(
-                orderHistoryViewmodel, context, outputmessage,
-                orderHistoryState, file, formatted, loading
-            )
-            "Name" -> nameReport(
-                orderHistoryViewmodel, context, outputmessage,
-                orderHistoryState, file, formatted, loading
-            )
-            "Status" -> statusReport(
-                orderHistoryViewmodel, context, outputmessage,
-                orderHistoryState, file, formatted, loading
-            )
 
-        }
+        Text(
+            text = outputmessage,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.clickable {
+                if (outputmessage.equals("Order_History_$formatted.xlsx saved in documents folder")) {
+                    try {
+                        val uri = Uri.fromFile(file)
+                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                            setDataAndType(uri, getMimeType(file.absolutePath))
+                            flags =
+                                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        }
+
+                        val contentUri = getUriForFile(
+                            context,
+                            "com.devs.adminapplication.fileprovider",
+                            file
+                        )
+                        intent.setDataAndType(contentUri, getMimeType(file.absolutePath))
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        openFileLauncher.launch(intent)
+                    } catch (e: IOException) {
+//                        setErrorMessage("Error opening file")
+                    } catch (e: ActivityNotFoundException) {
+
+                    }
+                }
+
+            })
 
     }
-
 }
 
 @Composable
-private fun dateReport(
+fun OrderHistoryByOrderId(
+    fileSaved: MutableState<Boolean>,
+    orderHistoryViewmodel: OrderHistoryViewmodel, context: Context) {
+    val fromOrderID = remember { mutableStateOf("") }
+    val toOrderID = remember { mutableStateOf("") }
+    val focusManager = LocalFocusManager.current
+    TextBox(fromOrderID, "From Order ID", focusManager, enabled = true)
+    TextBox(toOrderID, "To Order ID", focusManager, enabled = true)
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 10.dp)
+            .height(55.dp),
+        shape = RoundedCornerShape(4.dp),
+        enabled = true,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = PrimaryLight
+        ),
+        onClick = {
+            fileSaved.value = false
+
+            if (fromOrderID != null && toOrderID != null) {
+                val res = toOrderID.value.toInt() - fromOrderID.value.toInt()
+                if (res >= 0) {
+                    orderHistoryViewmodel.getOrderHistoryByOrderId(fromOrderID.value,toOrderID.value)
+
+                } else {
+                    Toast.makeText(
+                        context,
+                        "To Order Id is less than to From Order ID ",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    orderHistoryViewmodel.resetOrderHistory()
+                }
+            }
+
+
+        }
+    ) {
+        Text(
+            text = "Fetch History",
+            color = Color.Black,
+            fontSize = 17.sp
+        )
+    }
+}
+
+@Composable
+private fun OrderHistoryByDate(
+    fileSaved: MutableState<Boolean>,
     orderHistoryViewmodel: OrderHistoryViewmodel,
     context: Context,
-    outputmessage: String,
-    orderHistoryState: OrderHistoryState,
-    file: File,
-    formatted: String?,
-    loading: Boolean
 ) {
 
-    var outputmessage1 = outputmessage
     val date1text = remember { mutableStateOf("") }
     val date2text = remember { mutableStateOf("") }
     var date1 by remember {
@@ -178,14 +307,6 @@ private fun dateReport(
     }
     var date2 by remember {
         mutableStateOf(LocalDate.now())
-    }
-
-    val openFileLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { activityResult ->
-        if (activityResult.resultCode == RESULT_OK) {
-            // Handle success
-        }
     }
     DateBoxSelectable(dateText = date1text, label = "From Date") {
         date1 = it
@@ -204,6 +325,7 @@ private fun dateReport(
             containerColor = PrimaryLight
         ),
         onClick = {
+            fileSaved.value = false
             Log.d(
                 "json2xls",
                 "OrderHistoryScreen: ${date1text.value} $date1 ${date2text.value} $date2"
@@ -216,7 +338,7 @@ private fun dateReport(
                 } else if (res > 0) {
                     Toast.makeText(context, "To Date is before From Date ", Toast.LENGTH_SHORT)
                         .show()
-                    outputmessage1 = "To Date is before From Date "
+//                    outputmessage1 = "To Date is before From Date "
                     orderHistoryViewmodel.resetOrderHistory()
                 } else {
                     Toast.makeText(
@@ -224,7 +346,7 @@ private fun dateReport(
                         "To Date is equal to From Date ",
                         Toast.LENGTH_SHORT
                     ).show()
-                    outputmessage1 = "To Date is equal to From Date "
+//                    outputmessage1 = "To Date is equal to From Date "
                     orderHistoryViewmodel.resetOrderHistory()
                 }
             }
@@ -238,109 +360,6 @@ private fun dateReport(
             fontSize = 17.sp
         )
     }
-
-    Spacer(modifier = Modifier.size(10.dp))
-    if (loading) {
-        androidx.compose.material.CircularProgressIndicator(color = PrimaryDark)
-    } else {
-        if (orderHistoryState.orderHistory.isNotEmpty()) {
-            TableOrderHistory(orderHistory = orderHistoryState.orderHistory)
-            try {
-                val uri = Uri.fromFile(file)
-                val intent = Intent(Intent.ACTION_VIEW).apply {
-                    setDataAndType(uri, getMimeType(file.absolutePath))
-                    flags =
-                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_GRANT_READ_URI_PERMISSION
-                }
-
-                val contentUri = getUriForFile(
-                    context,
-                    "com.devs.adminapplication.fileprovider",
-                    file
-                )
-                intent.setDataAndType(contentUri, getMimeType(file.absolutePath))
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-
-                openFileLauncher.launch(intent)
-
-
-            } catch (e: IOException) {
-//                        setErrorMessage("Error opening file")
-            } catch (e: ActivityNotFoundException) {
-
-            }
-        }
-    }
-    Spacer(modifier = Modifier.size(10.dp))
-
-    Text(
-        text = outputmessage1,
-        textAlign = TextAlign.Center,
-        modifier = Modifier.clickable {
-            if (outputmessage1.equals("Order_History_$formatted.xlsx saved in documents folder")) {
-                try {
-                    val uri = Uri.fromFile(file)
-                    val intent = Intent(Intent.ACTION_VIEW).apply {
-                        setDataAndType(uri, getMimeType(file.absolutePath))
-                        flags =
-                            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    }
-
-                    val contentUri = getUriForFile(
-                        context,
-                        "com.devs.adminapplication.fileprovider",
-                        file
-                    )
-                    intent.setDataAndType(contentUri, getMimeType(file.absolutePath))
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    openFileLauncher.launch(intent)
-                } catch (e: IOException) {
-//                        setErrorMessage("Error opening file")
-                } catch (e: ActivityNotFoundException) {
-
-                }
-            }
-
-        })
-
-}
-
-@Composable
-private fun nameReport(
-    orderHistoryViewmodel: OrderHistoryViewmodel,
-    context: Context,
-    outputmessage: String,
-    orderHistoryState: OrderHistoryState,
-    file: File,
-    formatted: String?,
-    loading: Boolean
-) {
-
-}
-
-@Composable
-private fun todayReport(
-    orderHistoryViewmodel: OrderHistoryViewmodel,
-    context: Context,
-    outputmessage: String,
-    orderHistoryState: OrderHistoryState,
-    file: File,
-    formatted: String?,
-    loading: Boolean
-) {
-
-}
-
-@Composable
-private fun statusReport(
-    orderHistoryViewmodel: OrderHistoryViewmodel,
-    context: Context,
-    outputmessage: String,
-    orderHistoryState: OrderHistoryState,
-    file: File,
-    formatted: String?,
-    loading: Boolean
-) {
 
 }
 
@@ -392,6 +411,9 @@ data class OrderHistoryResponse(
 fun dataClassToExcel(
     orderHistoryList: List<OrderHistory>,
     file: File,
+    openFileLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>,
+    context: Context,
+    fileDir: File
 ) {
 
     val workbook = XSSFWorkbook()
@@ -473,6 +495,7 @@ fun dataClassToExcel(
 //    }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateBoxSelectable(
@@ -549,6 +572,40 @@ private fun TableOrderHistory(
     ) {
 
 
+//    Column(
+//        modifier = Modifier
+//            .border(
+//                width = 1.dp,
+//                color = androidx.compose.material.TextFieldDefaults
+//                    .outlinedTextFieldColors()
+//                    .placeholderColor(
+//                        enabled = true
+//                    ).value,
+//                shape = RoundedCornerShape(5.dp)
+//            )
+//            .padding(5.dp)
+//    ) {
+//        Row {
+//            cell("Order ID", width = 60.dp, saveEnabled = true)
+//            cell("User ID", width = 60.dp, saveEnabled = true)
+//            cell("Total", width = 60.dp, saveEnabled = true)
+//            cell("Color", width = 60.dp, saveEnabled = true)
+//            cell("Size", width = 60.dp, saveEnabled = true)
+//            cell("Quantity", width = 60.dp, saveEnabled = true)
+//        }
+//
+//        for (order in orderHistory) {
+//            Row() {
+//                cell(order.orderId.toString(), width = 60.dp, saveEnabled = true)
+//                cell(order.userId.toString(), width = 60.dp, saveEnabled = true)
+//                cell(order.totalAmount.toString(), width = 60.dp, saveEnabled = true)
+//                cell(order.color.toString(), width = 60.dp, saveEnabled = true)
+//                cell(order.size.toString(), width = 60.dp, saveEnabled = true)
+//                cell(order.quantity.toString(), width = 60.dp, saveEnabled = true)
+//            }
+//        }
+//        //scrollable row
+//    }
     Column(
         modifier = Modifier
             .border(
@@ -560,6 +617,7 @@ private fun TableOrderHistory(
                     ).value,
                 shape = RoundedCornerShape(5.dp)
             )
+            .height(450.dp)
             .padding(5.dp)
     ) {
         Row {
@@ -570,18 +628,21 @@ private fun TableOrderHistory(
             cell("Size", width = 60.dp, saveEnabled = true)
             cell("Quantity", width = 60.dp, saveEnabled = true)
         }
+        LazyColumn(
+            modifier = Modifier.fillMaxHeight()
+        ) {
 
-        for (order in orderHistory) {
-            Row() {
-                cell(order.orderId.toString(), width = 60.dp, saveEnabled = true)
-                cell(order.userId.toString(), width = 60.dp, saveEnabled = true)
-                cell(order.totalAmount.toString(), width = 60.dp, saveEnabled = true)
-                cell(order.color.toString(), width = 60.dp, saveEnabled = true)
-                cell(order.size.toString(), width = 60.dp, saveEnabled = true)
-                cell(order.quantity.toString(), width = 60.dp, saveEnabled = true)
+            items(orderHistory) { order ->
+                Row() {
+                    cell(order.orderId.toString(), width = 60.dp, saveEnabled = true)
+                    cell(order.userId.toString(), width = 60.dp, saveEnabled = true)
+                    cell(order.totalAmount.toString(), width = 60.dp, saveEnabled = true)
+                    cell(order.color.toString(), width = 60.dp, saveEnabled = true)
+                    cell(order.size.toString(), width = 60.dp, saveEnabled = true)
+                    cell(order.quantity.toString(), width = 60.dp, saveEnabled = true)
+                }
             }
         }
-        //scrollable row
     }
 
 }

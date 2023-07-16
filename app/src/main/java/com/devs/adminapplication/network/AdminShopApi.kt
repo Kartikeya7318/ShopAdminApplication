@@ -11,6 +11,7 @@ import com.devs.adminapplication.models.productResponse.Products
 import com.devs.adminapplication.models.subcategories.SubCategoryList
 import com.devs.adminapplication.models.updateProduct.ProductUpdate
 import com.devs.adminapplication.screens.orderHistory.OrderHistoryResponse
+import com.devs.adminapplication.screens.orderTracking.UpdateTrackingResponse
 import com.devs.adminapplication.utils.Constants
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -164,10 +165,21 @@ interface AdminShopApi {
     ):Response<Retrofit>
 
 
-    @GET("user/orderHistory/admin")
+    @GET("admin/orderHistory")
     suspend fun getOrderHistory(
-        @Query("from") fromDate: String,
-        @Query("to") toDate: String,
+        @Query("fromDate") fromDate: String,
+        @Query("toDate") toDate: String,
         @Header("Authorization") token: String
     ): OrderHistoryResponse
+    @GET("admin/orderHistory")
+    suspend fun getOrderHistoryByOrderId(
+        @Query("fromOrderNumber") fromOrderNumber: String,
+        @Query("toOrderNumber") toOrderNumber: String,
+        @Header("Authorization") token: String
+    ): OrderHistoryResponse
+    @PUT("user/admin/orderAddress")
+    suspend fun updateTrackingDetail(
+        @Header("Authorization") token: String,
+        @Body requestBody: RequestBody,
+    ):UpdateTrackingResponse
 }

@@ -9,6 +9,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+
 import com.devs.adminapplication.screens.addBrands.AddBrandScreen
 import com.devs.adminapplication.screens.addBrands.AddBrandViewModel
 import com.devs.adminapplication.screens.addCategories.AddCategoryScreen
@@ -24,6 +25,8 @@ import com.devs.adminapplication.screens.home.HomeViewModel
 
 import com.devs.adminapplication.screens.orderHistory.OrderHistoryScreen
 import com.devs.adminapplication.screens.orderHistory.OrderHistoryViewmodel
+import com.devs.adminapplication.screens.orderTracking.OrderTrackingScreen
+import com.devs.adminapplication.screens.orderTracking.OrderTrackingViewmodel
 
 @Composable
 fun HomeNavGraph(navController2: NavHostController, navControllerRoot: NavHostController,homeViewModel: HomeViewModel) {
@@ -65,10 +68,12 @@ fun HomeNavGraph(navController2: NavHostController, navControllerRoot: NavHostCo
         composable(AdminScreens.OrderHistoryScreen.name) {
             val orderHistoryViewmodel= hiltViewModel<OrderHistoryViewmodel>()
            OrderHistoryScreen(orderHistoryViewmodel)
+
         }
-
-
-
+        composable(AdminScreens.OrderTrackingScreen.name){
+            val orderTrackingViewmodel= hiltViewModel<OrderTrackingViewmodel>()
+            OrderTrackingScreen()
+        }
 
     }
 }

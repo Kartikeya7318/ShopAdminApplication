@@ -242,11 +242,11 @@ fun Menu(
                         route = AdminScreens.OrderHistoryScreen.name
                     ),
                     MenuItem(
-                        id = "ongoingOrders",
-                        title = "Ongoing Orders",
+                        id = "orderTracking",
+                        title = "Order Tracking",
                         contentDescription = "Share",
                         icon = Icons.Default.Info,
-                        route = ""
+                        route = AdminScreens.OrderTrackingScreen.name
                     ),
                     MenuItem(
                         id = "completedOrders",

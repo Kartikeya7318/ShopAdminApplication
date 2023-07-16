@@ -15,7 +15,6 @@ import javax.inject.Inject
 
 data class OrderHistoryState(
     var orderHistory: List<OrderHistory> = emptyList(),
-
 )
 
 @HiltViewModel
@@ -37,6 +36,25 @@ class OrderHistoryViewmodel @Inject constructor(
                     fromDate = fromDate,
                     toDate = toDate
                 )
+            if (response.orderHistory!=null){
+                _orderHistoryState.value=_orderHistoryState.value.copy(
+                    orderHistory = response.orderHistory
+                )
+                _loading.value=false
+            }
+
+        }
+    }
+    fun getOrderHistoryByOrderId(fromOrderId: String, toOrderId: String) {
+//        Log.d("json2xls", "Path: " + fromDate + " " + toDate)
+//        Log.d("json2xls", "Path: " + fromDate.reversed() + " " + toDate.reversed())
+        _loading.value=true
+        viewModelScope.launch {
+            val response=api.getOrderHistoryByOrderId(
+                token = myPreference.getStoredTag(),
+                fromOrderNumber = fromOrderId,
+                toOrderNumber = toOrderId
+            )
             if (response.orderHistory!=null){
                 _orderHistoryState.value=_orderHistoryState.value.copy(
                     orderHistory = response.orderHistory
